@@ -450,8 +450,10 @@ function vJogo(){
   const missing = Math.max(0, t.vagas - L.inGame.length);
   const others = []; S.data.turmas.filter(x => x.id !== t.id).forEach(x => x.membros.forEach(n => { if (!t.membros.includes(n) && !others.includes(n)) others.push(n); }));
   const subsPres = L.pres.filter(p => p.tipo !== "membro");
+  const drawn = !!sorteioOf(t, date) && !S.f.redraw;
   return `
   <div><div class="kick">${date===today()?"Hoje":DIAS[t.dia_semana]} · ${ddmm(date)}</div><h2>Jogo de ${esc(t.nome.toLowerCase())}</h2><div class="muted">${hm(t.hora_inicio)} às ${hm(t.hora_fim)} · ${esc(t.local||"")} · ${t.vagas} vagas</div></div>
+  ${drawn? vDia(t) : ''}
   <section class="card col">
     <div class="row" style="justify-content:space-between"><h3>Presença</h3><b>${L.inGame.length} de ${t.vagas}</b></div>
     <div class="bar"><i style="width:${Math.round(L.inGame.length*100/Math.max(1,t.vagas))}%"></i></div>
@@ -460,7 +462,7 @@ function vJogo(){
     ${L.queue.length? `<span class="muted">Fila de espera: ${L.queue.map(q => esc(q.nome)).join(", ")}</span>`:""}
     <span class="muted">Toque em Vou ou Não no seu nome. Quem marca primeiro garante a vaga.</span>
   </section>
-  ${vSorteio(t, date, L)}
+  ${drawn? '' : vDia(t)}
   <section class="card col">
     <div><b style="font-size:16px">Completar o jogo</b><div class="muted">${missing? (missing===1?"Falta 1 jogador.":"Faltam "+missing+" jogadores."):"Jogo completo. Bom jogo!"}</div></div>
     ${others.length? `<label class="l">Da outra turma</label>${others.map(n => { const p = L.pres.find(x => x.nome === n); return `<div class="person">${av(n)}<span class="pname">${esc(n)}</span><button class="btn ${p?'ghost':'teal'} small" data-act="callSub" data-n="${esc(n)}">${p?'Chamado ✓':'Chamar'}</button></div>`; }).join("")}`:""}
@@ -480,7 +482,7 @@ function vSorteio(t, date, L){
     const per = P.length ? sor.jogos.length*4/P.length : 0;
     const seen = {};
     return `<section class="card col" id="sorteio">
-      <div class="row" style="justify-content:space-between"><div><b style="font-size:16px">Jogos sorteados</b><div class="muted">${sor.jogos.length} jogos · ${per} para cada · ${done} de ${sor.jogos.length} com placar</div></div></div>
+      <div class="row" style="justify-content:space-between"><div><div class="kick">${date===today()?"Hoje":DIAS[t.dia_semana]+" "+ddmm(date)} · ${esc(t.nome)}</div><b style="font-size:16px">Jogos sorteados</b><div class="muted">${sor.jogos.length} jogos · ${per} para cada · ${done} de ${sor.jogos.length} com placar</div></div></div>
       ${sor.local? '<div class="demo" style="margin:0">Este sorteio ficou só neste celular. Para a turma toda ver, falta um ajuste no banco (avise o Norton).</div>':''}
       <div class="col" style="gap:8px">${sor.jogos.map((j,i) => {
         const g = st[i]; const rest = P.filter(p => !j.a.includes(p) && !j.b.includes(p));
@@ -492,9 +494,15 @@ function vSorteio(t, date, L){
           <div style="flex:1"><div class="kick" style="color:${next?'#E76F51':'#6B7280'}">Jogo ${i+1}${next?' · agora':''}${rep?' · dupla repetida':''}</div>
           <div style="font-weight:700">${esc(j.a.join(" / "))} <span class="muted">x</span> ${esc(j.b.join(" / "))}</div>
           ${rest.length? `<div class="muted" style="font-size:12px">Descansa: ${rest.map(esc).join(", ")}</div>`:''}</div>
-          ${g? `<div style="text-align:right">${score}<div class="muted" style="font-size:12px">lançado ✓</div></div>` : (c? `<button class="btn ${next?'':'ghost'} small" data-act="drawLaunch" data-i="${i}">Lançar placar</button>`:'')}
-        </div></div>`; }).join("")}</div>
-      ${S.confirm === "redraw" ? `<div class="col" style="gap:6px"><span class="muted">${done? 'Já tem '+done+' placar(es) lançado(s). Eles continuam valendo no ranking; só a lista de jogos muda.':'A lista atual será trocada.'}</span><div class="grid2"><button class="btn danger small" data-act="redrawGo">Sim, sortear de novo</button><button class="btn ghost small" data-act="ask" data-id="">Cancelar</button></div></div>` : `<button class="btn ghost small" data-act="ask" data-id="redraw">Sortear de novo</button>`}
+          ${g? `<div style="text-align:right">${score}<div class="muted" style="font-size:12px">lançado ✓</div></div>` : (c && S.f.scoreOpen !== i ? `<button class="btn ${next?'':'ghost'} small" data-act="dOpen" data-i="${i}">Lançar placar</button>`:'')}
+        </div>
+        ${!g && c && S.f.scoreOpen === i ? `<div class="col" style="gap:6px;margin-top:10px">
+          <label class="l">${esc(j.a.join(" / "))}</label>${scoreBtns("spa")}
+          <label class="l">${esc(j.b.join(" / "))}</label>${scoreBtns("spb")}
+          <div class="grid2"><button class="btn small" data-act="dSave" data-i="${i}">Salvar placar</button><button class="btn ghost small" data-act="dClose">Cancelar</button></div>
+        </div>` : ''}</div>`; }).join("")}</div>
+      ${done ? '<span class="muted">Com placar lançado, o sorteio fica travado. Para corrigir um placar, exclua o jogo na aba Campeonato, em Jogos.</span>'
+        : (S.confirm === "redraw" ? `<div class="col" style="gap:6px"><span class="muted">A lista atual será trocada por um novo sorteio.</span><div class="grid2"><button class="btn danger small" data-act="redrawGo">Sim, sortear de novo</button><button class="btn ghost small" data-act="ask" data-id="">Cancelar</button></div></div>` : `<button class="btn ghost small" data-act="ask" data-id="redraw">Sortear de novo</button>`)}
     </section>`;
   }
   const cand = drawCandidates(t, date, L);
@@ -504,7 +512,7 @@ function vSorteio(t, date, L){
   const def = defaultRounds(n, t);
   const rounds = Math.max(1, Number(S.f.drawRounds) || def || 1);
   return `<section class="card col" id="sorteio">
-    <div><b style="font-size:16px">Sortear os jogos</b><div class="muted">Faça um pouco antes da partida. Todo mundo joga o mesmo número de jogos.</div></div>
+    <div><div class="kick">${date===today()?"Hoje":DIAS[t.dia_semana]+" "+ddmm(date)} · ${esc(t.nome)}</div><b style="font-size:16px">Sortear os jogos</b><div class="muted">Faça um pouco antes da partida. Todo mundo joga o mesmo número de jogos.</div></div>
     <label class="l">Quem joga hoje (${n})</label>
     <div class="chips" style="flex-wrap:wrap">${cand.map(nm => `<button class="chip ${pick.includes(nm)?'on':''}" data-act="drawToggle" data-n="${esc(nm)}">${pick.includes(nm)?'✓ ':''}${esc(nm)}</button>`).join("")}</div>
     ${n < 4 ? '<span class="muted">Marque pelo menos 4 jogadores.</span>' : `
@@ -514,6 +522,13 @@ function vSorteio(t, date, L){
     ${n===6? '<span class="muted">Com 6: as 15 duplas possíveis jogam uma vez e, no fim, 3 duplas se repetem para fechar 6 jogos para cada.</span>':''}`}
     ${S.f.redraw? '<button class="btn ghost small" data-act="redrawCancel">Voltar para o sorteio atual</button>':''}
   </section>`;
+}
+
+function scoreBtns(k){ let h = ""; for (let v = 0; v <= 7; v++) h += `<button class="${S.f[k]===v?'on':''}" data-act="score" data-k="${k}" data-v="${v}" aria-label="${v} games">${v}</button>`; return `<div class="scorebtns">${h}</div>`; }
+function vDia(t){
+  const date = nextDate(t); const L = lineup(t, date); const c = currentChamp(t.id);
+  const manual = S.f.manual && c ? (S.champ = c.id, vLancar(c)) : "";
+  return vSorteio(t, date, L) + (c ? `<button class="btn ghost small" data-act="manual">${S.f.manual? 'Fechar jogo fora do sorteio' : '+ Lançar jogo fora do sorteio'}</button>` : '') + manual;
 }
 
 function vRank(){
@@ -537,7 +552,12 @@ function vRank(){
       <div class="row" style="justify-content:space-between"><span class="muted">Jogo ${g.numero||""} · ${ddmm(g.data)}${sub.length? ' · fora do ranking: '+sub.map(esc).join(", "):""}</span>
       ${S.confirm === "g:"+g.id ? `<button class="btn danger small" data-act="delGame" data-id="${esc(g.id)}">Confirmar exclusão</button>` : `<button class="btn ghost small" data-act="ask" data-id="g:${esc(g.id)}">Excluir</button>`}</div></div>`; }).join("") || '<span class="muted">Sem jogos neste dia.</span>'}</div>`;
   }
-  if (S.ctab === "lancar") return head + vLancar(c);
+  if (S.ctab === "lancar") {
+    const tc = S.data.turmas.find(x => x.id === c.turma_id);
+    const cur = tc && currentChamp(tc.id);
+    if (tc && cur && cur.id === c.id && !c.encerrado) return head + vDia(tc);
+    return head + vLancar(c);
+  }
   const r = ranking(c, S.day);
   const pod = [1,0,2].filter(i => r[i]).map(i => { const h = i===0?100:(i===1?80:68); const col = ["#E76F51","#14213D","#0B6E6D"][i]; return `<div class="pod"><b>${esc(r[i].nome)}</b><div style="height:${h}px;background:${col}"><span style="font-size:12px;font-weight:700">${i+1}º</span><span class="n">${r[i].total}</span><span style="font-size:11px">pts</span></div></div>`; }).join("");
   const label = i => i===0?"CAMPEÃO":(i===1?"Segundo":(i===2?"Terceiro":""));
@@ -741,9 +761,13 @@ document.addEventListener("click", e => {
     case "rosterDel": { const c = S.data.campeonatos.find(x => x.id === d.c); act(() => DB.update("campeonatos", c.id, {jogadores:(c.jogadores||[]).filter(n => n !== d.n)}), d.n+" saiu do ranking"); break; }
     case "toggleEnc": { const c = S.data.campeonatos.find(x => x.id === d.c); act(() => DB.update("campeonatos", c.id, {encerrado:!c.encerrado})); break; }
     case "drawToggle": { const p = S.f.drawPick || []; S.f.drawPick = p.includes(d.n) ? p.filter(x => x !== d.n) : p.concat(d.n); render(); break; }
-    case "drawGo": doDraw(t); break;
+    case "drawGo": doDraw(drawTurma()); break;
     case "redrawGo": S.f.redraw = true; S.f.drawPick = null; render(); break;
     case "redrawCancel": S.f.redraw = false; render(); break;
+    case "dOpen": S.f.scoreOpen = Number(d.i); S.f.spa = null; S.f.spb = null; render(); break;
+    case "dClose": S.f.scoreOpen = null; render(); break;
+    case "dSave": saveDrawGame(Number(d.i)); break;
+    case "manual": S.f.manual = !S.f.manual; render(); break;
     case "drawLaunch": { const date = nextDate(t); const sor = sorteioOf(t, date); const j = sor && sor.jogos[Number(d.i)]; const c = currentChamp(t.id); if (!j || !c) return;
       Object.assign(S.f, {a1:j.a[0], a2:j.a[1], b1:j.b[0], b2:j.b[1], pa:null, pb:null, data:date, fromDraw:true}); S.view = "rank"; S.champ = c.id; S.ctab = "lancar"; window.scrollTo(0,0); render(); break; }
     case "newChamp": newChamp(); break;
@@ -772,6 +796,21 @@ function saveGame(){
   const back = S.f.fromDraw;
   if (back) { S.f.a1 = S.f.a2 = S.f.b1 = S.f.b2 = ""; S.f.fromDraw = false; }
   act(async () => { await DB.insert("partidas", row); if (back) { S.view = "jogo"; } }, "Placar salvo. Ranking atualizado.");
+}
+function drawTurma(){
+  // na aba Campeonato, a turma é a do campeonato aberto; nas outras, a turma selecionada
+  if (S.view === "rank") { const c = S.data.campeonatos.find(x => x.id === S.champ); const tc = c && S.data.turmas.find(x => x.id === c.turma_id); if (tc) return tc; }
+  return turmaAtual();
+}
+function saveDrawGame(i){
+  const t = drawTurma(); const date = nextDate(t); const sor = sorteioOf(t, date); const c = currentChamp(t.id);
+  const j = sor && sor.jogos[i]; if (!j || !c) return;
+  if (S.f.spa == null || S.f.spb == null) return toast("Marque o placar das duas duplas.");
+  if (S.f.spa === S.f.spb) return toast("Placar empatado não vale.");
+  const numero = gamesOf(c.id).reduce((m,g) => Math.max(m, g.numero||0), 0) + 1;
+  const row = {campeonato_id:c.id, numero, data:date, a1:j.a[0], a2:j.a[1], b1:j.b[0], b2:j.b[1], placar_a:S.f.spa, placar_b:S.f.spb};
+  S.f.scoreOpen = null; S.f.spa = null; S.f.spb = null;
+  act(() => DB.insert("partidas", row), "Jogo "+(i+1)+" lançado. Ranking atualizado.");
 }
 async function publish(){
   if (!S.me) { S.sheet = "who"; return render(); }
