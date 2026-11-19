@@ -102,6 +102,7 @@ label.l{font-size:13px;font-weight:700}
 .drawg.next{border-color:#E76F51;box-shadow:0 0 0 2px rgba(231,111,81,.15)}
 .feed{padding:0;overflow:hidden}
 .feed .ph{display:block;width:100%;max-height:560px;object-fit:cover;background:#EFE8DB}
+.feed video.ph{object-fit:contain;background:#000}
 .fb{display:flex;flex-direction:column;gap:6px;padding:10px 12px 12px}
 .ic{background:none;border:0;padding:4px;margin:-4px;color:var(--ink);cursor:pointer;min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center}
 .lnk{background:none;border:0;padding:0;color:var(--muted);font-size:13px;cursor:pointer;text-align:left}
@@ -379,11 +380,20 @@ function compressImage(file, max = 1440, q = 0.82){
     img.src = url;
   });
 }
-async function uploadPhoto(blob){
+const VIDEO_MAX_MB = 50;
+const isVideoUrl = u => /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(String(u||"")) || /^data:video\//.test(String(u||""));
+function videoExt(type){ return /quicktime/.test(type) ? "mov" : /webm/.test(type) ? "webm" : "mp4"; }
+async function uploadPhoto(blob, type){
+  type = type || "image/jpeg";
   if (!ONLINE) return await new Promise(ok => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(blob); });
-  const path = new Date().toISOString().slice(0,7) + "/" + uid("f") + ".jpg";
-  const { error } = await sb.storage.from("fotos").upload(path, blob, {contentType:"image/jpeg", cacheControl:"31536000"});
-  if (error) throw error;
+  const ext = type.startsWith("video/") ? videoExt(type) : "jpg";
+  const path = new Date().toISOString().slice(0,7) + "/" + uid(ext === "jpg" ? "f" : "v") + "." + ext;
+  const { error } = await sb.storage.from("fotos").upload(path, blob, {contentType:type, cacheControl:"31536000"});
+  if (error) {
+    if (/size|large|exceed/i.test(error.message||"")) throw new Error("vídeo maior que o limite do servidor");
+    if (/mime|type/i.test(error.message||"")) throw new Error("o servidor ainda não aceita vídeos (falta o ajuste no banco)");
+    throw error;
+  }
   return sb.storage.from("fotos").getPublicUrl(path).data.publicUrl;
 }
 async function removePhoto(url){
@@ -441,7 +451,7 @@ function vInicio(){
   </section>
   <section class="card col">
     <div class="row" style="justify-content:space-between"><h3>Resenha da turma</h3><button class="btn ghost small" data-act="view" data-v="mural">Abrir</button></div>
-    ${posts.map(p => `<div class="post" data-act="view" data-v="mural" style="cursor:pointer"><div class="row">${av(p.autor)}<b style="flex:1">${esc(p.autor)}</b><span class="muted">${ago(p.created_at)}</span></div>${p.foto? `<img src="${esc(p.foto)}" alt="" loading="lazy" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px">`:''}${p.texto? `<div>${esc(p.texto)}</div>`:''}</div>`).join("") || '<span class="muted">Nada ainda. Seja o primeiro a postar.</span>'}
+    ${posts.map(p => `<div class="post" data-act="view" data-v="mural" style="cursor:pointer"><div class="row">${av(p.autor)}<b style="flex:1">${esc(p.autor)}</b><span class="muted">${ago(p.created_at)}</span></div>${p.foto? (isVideoUrl(p.foto)? `<div style="position:relative"><video src="${esc(p.foto)}#t=0.1" muted playsinline preload="metadata" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;background:#000;pointer-events:none"></video><span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:24px;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px">▶</span></div>` : `<img src="${esc(p.foto)}" alt="" loading="lazy" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px">`):''}${p.texto? `<div>${esc(p.texto)}</div>`:''}</div>`).join("") || '<span class="muted">Nada ainda. Seja o primeiro a postar.</span>'}
   </section>`;
 }
 
@@ -605,10 +615,10 @@ function vMural(){
   const np = S.f.newPhoto;
   const composer = S.f.compose || np ? `<section class="card col">
       <div class="row">${av(S.me||"?")}<b style="flex:1">Nova publicação</b><button class="btn ghost small" data-act="composeCancel">Cancelar</button></div>
-      ${np? `<img src="${np.url}" alt="Prévia da foto" style="width:100%;max-height:420px;object-fit:cover;border-radius:12px">` : ''}
-      ${S.noSocial? '' : (S.f.loadingPhoto? '<div class="muted" style="text-align:center;padding:10px">Preparando a foto…</div>' : `<button class="btn ${np?'ghost':'sand'} small" data-act="pickPhoto">${np?'Trocar foto':'Escolher foto (câmera ou galeria)'}</button>`)}
+      ${np? (np.video? `<video src="${np.url}" controls playsinline muted style="width:100%;max-height:420px;border-radius:12px;background:#000"></video><div class="muted">Vídeo de ${np.mb.toFixed(1)} MB${np.mb > 15 ? ' · pode levar um pouco para enviar':''}</div>` : `<img src="${np.url}" alt="Prévia da foto" style="width:100%;max-height:420px;object-fit:cover;border-radius:12px">`) : ''}
+      ${S.noSocial? '' : (S.f.loadingPhoto? '<div class="muted" style="text-align:center;padding:10px">Preparando a foto…</div>' : `<button class="btn ${np?'ghost':'sand'} small" data-act="pickPhoto">${np?'Trocar foto ou vídeo':'Escolher foto ou vídeo'}</button>`)}
       <textarea class="f" id="post" data-bind="post" placeholder="${np?'Escreva uma legenda…':'Resenha, recado, provocação saudável…'}">${esc(S.f.post)}</textarea>
-      <button class="btn" data-act="post" ${S.f.posting?'disabled':''}>${S.f.posting?'Publicando…':'Publicar'}</button>
+      <button class="btn" data-act="post" ${S.f.posting?'disabled':''}>${S.f.posting? (np && np.video? 'Enviando o vídeo… não feche o app':'Publicando…') :'Publicar'}</button>
     </section>`
     : `<button class="btn" data-act="compose" style="width:100%">+ Nova publicação</button>`;
   return `<div class="row" style="justify-content:space-between"><div><div class="kick">Raquete de Quinta</div><h2>Resenha</h2></div></div>
@@ -620,7 +630,7 @@ function vMural(){
     return `<article class="card feed">
       <div class="row" style="padding:12px 12px 8px">${av(p.autor)}<div style="flex:1"><b>${esc(p.autor)}</b> <span class="muted">· ${ago(p.created_at)}</span></div>
       ${p.autor===S.me? (S.confirm==="m:"+p.id? `<button class="btn danger small" data-act="delPost" data-id="${esc(p.id)}">Apagar</button>`:`<button class="btn ghost small" data-act="ask" data-id="m:${esc(p.id)}" aria-label="Opções">…</button>`):""}</div>
-      ${p.foto? `<img class="ph" src="${esc(p.foto)}" alt="Foto de ${esc(p.autor)}" loading="lazy" data-dbl="${esc(p.id)}">` : ''}
+      ${p.foto? (isVideoUrl(p.foto)? `<video class="ph" src="${esc(p.foto)}#t=0.1" controls playsinline preload="metadata"></video>` : `<img class="ph" src="${esc(p.foto)}" alt="Foto de ${esc(p.autor)}" loading="lazy" data-dbl="${esc(p.id)}">`) : ''}
       <div class="fb">
         ${S.noSocial? '' : `<div class="row" style="gap:14px"><button class="ic" data-act="like" data-id="${esc(p.id)}" aria-label="Curtir">${HEART(liked)}</button><button class="ic" data-act="openC" data-id="${esc(p.id)}" aria-label="Comentar">${BUBBLE}</button></div>
         ${likes.length? `<div style="font-weight:700;font-size:14px">${likes.length===1? 'Curtido por '+esc(likes[0]) : likes.length+' curtidas'}</div>`:''}`}
@@ -705,13 +715,22 @@ document.addEventListener("change", e => {
 });
 // campo de foto fixo, fora da área que a tela redesenha (a atualização automática não o apaga)
 const PHOTO_IN = document.createElement("input");
-PHOTO_IN.type = "file"; PHOTO_IN.accept = "image/*"; PHOTO_IN.style.cssText = "position:fixed;left:-9999px;width:1px;height:1px;opacity:0";
+PHOTO_IN.type = "file"; PHOTO_IN.accept = "image/*,video/*"; PHOTO_IN.style.cssText = "position:fixed;left:-9999px;width:1px;height:1px;opacity:0";
 document.body.appendChild(PHOTO_IN);
 function onPhotoPicked(){
   const f = PHOTO_IN.files && PHOTO_IN.files[0];
   S.picking = false;
   if (!f) return;
-  S.f.compose = true; S.f.loadingPhoto = true; render();
+  S.f.compose = true;
+  if ((f.type||"").startsWith("video/") || /\.(mov|mp4|m4v|webm)$/i.test(f.name||"")) {
+    const mb = f.size/1048576;
+    PHOTO_IN.value = ""; S.view = "mural";
+    if (mb > VIDEO_MAX_MB) { render(); return toast(`Vídeo grande demais (${mb.toFixed(0)} MB). O limite é ${VIDEO_MAX_MB} MB: corte o vídeo no celular (uns 20 a 30 segundos) e tente de novo.`); }
+    if (S.f.newPhoto) URL.revokeObjectURL(S.f.newPhoto.url);
+    S.f.newPhoto = {blob:f, url:URL.createObjectURL(f), video:true, type:f.type || "video/mp4", mb};
+    return render();
+  }
+  S.f.loadingPhoto = true; render();
   compressImage(f)
     .then(r => { if (S.f.newPhoto) URL.revokeObjectURL(S.f.newPhoto.url); S.f.newPhoto = {blob:r.blob, url:URL.createObjectURL(r.blob)}; })
     .catch(err => toast("Não consegui abrir a foto: " + err.message))
@@ -815,11 +834,11 @@ function saveDrawGame(i){
 async function publish(){
   if (!S.me) { S.sheet = "who"; return render(); }
   const tx = S.f.post.trim(); const np = S.f.newPhoto;
-  if (!tx && !np) return toast("Escolha uma foto ou escreva algo.");
+  if (!tx && !np) return toast("Escolha uma foto, um vídeo ou escreva algo.");
   S.f.posting = true; render();
   try {
     const row = {autor:S.me, texto:tx};
-    if (np) row.foto = await uploadPhoto(np.blob);
+    if (np) row.foto = await uploadPhoto(np.blob, np.video ? np.type : "image/jpeg");
     await DB.insert("mural", row);
     if (np) URL.revokeObjectURL(np.url);
     S.f.newPhoto = null; S.f.compose = false; S.f.post = "";
