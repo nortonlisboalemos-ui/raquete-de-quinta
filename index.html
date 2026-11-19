@@ -100,6 +100,11 @@ label.l{font-size:13px;font-weight:700}
 .drawg{border:1px solid #E7E2D3;border-radius:12px;padding:10px 12px;background:#fff}
 .drawg.ok{background:#F2F7F3;border-color:#CFE3D5}
 .drawg.next{border-color:#E76F51;box-shadow:0 0 0 2px rgba(231,111,81,.15)}
+.feed{padding:0;overflow:hidden}
+.feed .ph{display:block;width:100%;max-height:560px;object-fit:cover;background:#EFE8DB}
+.fb{display:flex;flex-direction:column;gap:6px;padding:10px 12px 12px}
+.ic{background:none;border:0;padding:4px;margin:-4px;color:var(--ink);cursor:pointer;min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center}
+.lnk{background:none;border:0;padding:0;color:var(--muted);font-size:13px;cursor:pointer;text-align:left}
 </style>
 </head>
 <body>
@@ -151,7 +156,7 @@ const saveDemo = () => store.set(DEMO_KEY, JSON.stringify(demo));
 
 const DB = {
   async loadAll(){
-    if (!ONLINE) { demo.sorteios = demo.sorteios || []; return JSON.parse(JSON.stringify(demo)); }
+    if (!ONLINE) { demo.sorteios = demo.sorteios || []; demo.comentarios = demo.comentarios || []; return JSON.parse(JSON.stringify(demo)); }
     const out = {};
     for (const t of TABLES) {
       let q = sb.from(t).select("*");
@@ -161,6 +166,9 @@ const DB = {
       if (error) throw error;
       out[t] = data || [];
     }
+    out.comentarios = [];
+    try { const { data, error } = await sb.from("comentarios").select("*").order("created_at", {ascending:true}).limit(1000); if (error) throw error; out.comentarios = data || []; S.noSocial = false; }
+    catch(e){ S.noSocial = true; }
     out.sorteios = [];
     try { const d = new Date(); d.setDate(d.getDate()-8); const { data, error } = await sb.from("sorteios").select("*").gte("data", ymd(d)); if (error) throw error; out.sorteios = data || []; S.noSorteios = false; }
     catch(e){ S.noSorteios = true; }
@@ -358,12 +366,38 @@ async function saveSorteio(t, date, jogos){
   return false;
 }
 
+/* ---------- resenha (fotos) ---------- */
+function compressImage(file, max = 1440, q = 0.82){
+  return new Promise((ok, fail) => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => { const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight)); const w = Math.round(img.naturalWidth*k), h = Math.round(img.naturalHeight*k);
+      const cv = document.createElement("canvas"); cv.width = w; cv.height = h; cv.getContext("2d").drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url);
+      cv.toBlob(b => b ? ok({blob:b, w, h}) : fail(new Error("não consegui ler a foto")), "image/jpeg", q); };
+    img.onerror = () => { URL.revokeObjectURL(url); fail(new Error("formato de foto não suportado")); };
+    img.src = url;
+  });
+}
+async function uploadPhoto(blob){
+  if (!ONLINE) return await new Promise(ok => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(blob); });
+  const path = new Date().toISOString().slice(0,7) + "/" + uid("f") + ".jpg";
+  const { error } = await sb.storage.from("fotos").upload(path, blob, {contentType:"image/jpeg", cacheControl:"31536000"});
+  if (error) throw error;
+  return sb.storage.from("fotos").getPublicUrl(path).data.publicUrl;
+}
+async function removePhoto(url){
+  if (!ONLINE || !url) return; const i = url.indexOf("/fotos/"); if (i < 0) return;
+  try { await sb.storage.from("fotos").remove([decodeURIComponent(url.slice(i+7))]); } catch(e){}
+}
+const ago = s => { const d = (Date.now() - new Date(s).getTime())/60000; if (d < 1) return "agora"; if (d < 60) return Math.floor(d)+" min"; if (d < 1440) return Math.floor(d/60)+" h"; if (d < 10080) return Math.floor(d/1440)+" d"; return new Date(s).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}); };
+const HEART = on => `<svg viewBox="0 0 24 24" width="26" height="26" fill="${on?'#E76F51':'none'}" stroke="${on?'#E76F51':'currentColor'}" stroke-width="2" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.3-9.3C1.4 7.8 3.6 4.5 7 4.5c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3.4 0 5.6 3.3 4.3 6.7-1.8 4.7-9.3 9.3-9.3 9.3z"/></svg>`;
+const BUBBLE = `<svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>`;
+
 /* ---------- ícones ---------- */
 const ICON = {
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>',
   jogo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
   rank:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>',
-  mural:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>',
+  mural:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor"/></svg>',
   turma:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>'
 };
 const EMBLEM = s => `<svg width="${s}" height="${s}" viewBox="0 0 400 400" aria-hidden="true"><circle cx="200" cy="200" r="196" fill="#14213D"/><circle cx="200" cy="200" r="178" fill="none" stroke="#E9C46A" stroke-width="12"/><circle cx="200" cy="200" r="132" fill="#E9C46A"/><g transform="translate(200 238) rotate(-32)"><rect x="-9" y="-38" width="18" height="62" rx="6" fill="#14213D"/><ellipse cx="0" cy="-70" rx="34" ry="40" fill="#E76F51" stroke="#14213D" stroke-width="8"/></g><g transform="translate(200 238) rotate(32)"><rect x="-9" y="-38" width="18" height="62" rx="6" fill="#14213D"/><ellipse cx="0" cy="-70" rx="34" ry="40" fill="#E76F51" stroke="#14213D" stroke-width="8"/></g><circle cx="200" cy="124" r="24" fill="#F4F1DE" stroke="#14213D" stroke-width="7"/></svg>`;
@@ -403,8 +437,8 @@ function vInicio(){
         : `<div class="drawg next"><div class="kick" style="color:#E76F51">Jogo ${i+1} de ${sor.jogos.length}</div><div style="font-weight:700">${esc(sor.jogos[i].a.join(" / "))} <span class="muted">x</span> ${esc(sor.jogos[i].b.join(" / "))}</div></div><button class="btn ghost small" data-act="view" data-v="jogo">Ver todos os jogos sorteados</button>`; })()}
   </section>
   <section class="card col">
-    <div class="row" style="justify-content:space-between"><h3>Mural da turma</h3><button class="btn ghost small" data-act="view" data-v="mural">Abrir</button></div>
-    ${posts.map(p => `<div class="post"><div class="row">${av(p.autor)}<b>${esc(p.autor)}</b></div><div>${esc(p.texto)}</div></div>`).join("") || '<span class="muted">Nada ainda. Seja o primeiro a postar.</span>'}
+    <div class="row" style="justify-content:space-between"><h3>Resenha da turma</h3><button class="btn ghost small" data-act="view" data-v="mural">Abrir</button></div>
+    ${posts.map(p => `<div class="post" data-act="view" data-v="mural" style="cursor:pointer"><div class="row">${av(p.autor)}<b style="flex:1">${esc(p.autor)}</b><span class="muted">${ago(p.created_at)}</span></div>${p.foto? `<img src="${esc(p.foto)}" alt="" loading="lazy" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px">`:''}${p.texto? `<div>${esc(p.texto)}</div>`:''}</div>`).join("") || '<span class="muted">Nada ainda. Seja o primeiro a postar.</span>'}
   </section>`;
 }
 
@@ -544,10 +578,34 @@ function vLancar(c){
 
 function vMural(){
   const posts = S.data.mural.slice().sort((a,b) => String(b.created_at).localeCompare(String(a.created_at)));
-  return `<div><div class="kick">Raquete de Quinta</div><h2>Mural da turma</h2></div>
-  <section class="card col"><label class="l" for="post">Escreva para a turma${S.me? " como "+esc(S.me):""}</label><textarea class="f" id="post" data-bind="post" placeholder="Resenha, recado, provocação saudável…">${esc(S.f.post)}</textarea><button class="btn" data-act="post">Publicar</button></section>
-  <section class="card">${posts.map(p => `<div class="post"><div class="row">${av(p.autor)}<div style="flex:1"><b>${esc(p.autor)}</b><div class="muted">${new Date(p.created_at).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</div></div>
-  ${p.autor===S.me? (S.confirm==="m:"+p.id? `<button class="btn danger small" data-act="delPost" data-id="${esc(p.id)}">Apagar</button>`:`<button class="btn ghost small" data-act="ask" data-id="m:${esc(p.id)}">…</button>`):""}</div><div style="white-space:pre-wrap">${esc(p.texto)}</div></div>`).join("") || '<span class="muted">Nada ainda.</span>'}</section>`;
+  const cm = S.data.comentarios || [];
+  const np = S.f.newPhoto;
+  const composer = S.f.compose || np ? `<section class="card col">
+      <div class="row">${av(S.me||"?")}<b style="flex:1">Nova publicação</b><button class="btn ghost small" data-act="composeCancel">Cancelar</button></div>
+      ${np? `<img src="${np.url}" alt="Prévia da foto" style="width:100%;max-height:420px;object-fit:cover;border-radius:12px">` : ''}
+      ${S.noSocial? '' : `<label class="btn ${np?'ghost':'sand'} small" for="fotoIn" style="cursor:pointer">${np?'Trocar foto':'Escolher foto (câmera ou galeria)'}</label><input type="file" id="fotoIn" accept="image/*" style="display:none">`}
+      <textarea class="f" id="post" data-bind="post" placeholder="${np?'Escreva uma legenda…':'Resenha, recado, provocação saudável…'}">${esc(S.f.post)}</textarea>
+      <button class="btn" data-act="post" ${S.f.posting?'disabled':''}>${S.f.posting?'Publicando…':'Publicar'}</button>
+    </section>`
+    : `<button class="btn" data-act="compose" style="width:100%">+ Nova publicação</button>`;
+  return `<div class="row" style="justify-content:space-between"><div><div class="kick">Raquete de Quinta</div><h2>Resenha</h2></div></div>
+  ${S.noSocial && ONLINE? '<div class="demo" style="border-radius:12px">Fotos, curtidas e comentários ainda não foram ativados no banco. Por enquanto dá para publicar texto.</div>':''}
+  ${composer}
+  ${posts.map(p => {
+    const likes = Array.isArray(p.curtidas) ? p.curtidas : []; const liked = S.me && likes.includes(S.me);
+    const cs = cm.filter(c => c.post_id === p.id); const open = S.f.openC === p.id; const shown = open ? cs : cs.slice(-2);
+    return `<article class="card feed">
+      <div class="row" style="padding:12px 12px 8px">${av(p.autor)}<div style="flex:1"><b>${esc(p.autor)}</b> <span class="muted">· ${ago(p.created_at)}</span></div>
+      ${p.autor===S.me? (S.confirm==="m:"+p.id? `<button class="btn danger small" data-act="delPost" data-id="${esc(p.id)}">Apagar</button>`:`<button class="btn ghost small" data-act="ask" data-id="m:${esc(p.id)}" aria-label="Opções">…</button>`):""}</div>
+      ${p.foto? `<img class="ph" src="${esc(p.foto)}" alt="Foto de ${esc(p.autor)}" loading="lazy" data-dbl="${esc(p.id)}">` : ''}
+      <div class="fb">
+        ${S.noSocial? '' : `<div class="row" style="gap:14px"><button class="ic" data-act="like" data-id="${esc(p.id)}" aria-label="Curtir">${HEART(liked)}</button><button class="ic" data-act="openC" data-id="${esc(p.id)}" aria-label="Comentar">${BUBBLE}</button></div>
+        ${likes.length? `<div style="font-weight:700;font-size:14px">${likes.length===1? 'Curtido por '+esc(likes[0]) : likes.length+' curtidas'}</div>`:''}`}
+        ${p.texto? `<div style="white-space:pre-wrap">${p.foto? '<b>'+esc(p.autor)+'</b> ':''}${esc(p.texto)}</div>`:''}
+        ${!open && cs.length > 2? `<button class="lnk" data-act="openC" data-id="${esc(p.id)}">Ver os ${cs.length} comentários</button>`:''}
+        ${shown.map(c => `<div style="font-size:14px"><b>${esc(c.autor)}</b> ${esc(c.texto)} <span class="muted" style="font-size:12px">${ago(c.created_at)}</span>${c.autor===S.me? ` <button class="lnk" data-act="delC" data-id="${esc(c.id)}">apagar</button>`:''}</div>`).join("")}
+        ${S.noSocial? '' : `<div class="row"><input class="f" data-bind="cmt.${esc(p.id)}" value="${esc((S.f.cmt||{})[p.id]||"")}" placeholder="Comentar…" style="min-height:40px"><button class="btn small" data-act="sendC" data-id="${esc(p.id)}">Enviar</button></div>`}
+      </div></article>`; }).join("") || '<span class="muted">Nada ainda. Seja o primeiro a postar.</span>'}`;
 }
 
 function vTurma(){
@@ -607,7 +665,7 @@ function render(){
   ${ONLINE? "": '<div class="demo">Modo demonstração: os dados ficam só neste aparelho. Com o Supabase ligado, tudo passa a ser da turma.</div>'}
   ${S.err? `<div class="demo">${esc(S.err)}</div>`:""}
   <main>${(views[S.view]||vInicio)()}</main>
-  <nav class="nav"><div class="in">${[["inicio","Início","home"],["jogo","Jogo","jogo"],["rank","Campeonato","rank"],["mural","Mural","mural"],["turma","Turma","turma"]].map(([k,l,i]) => `<button class="${S.view===k?'on':''}" data-act="view" data-v="${k}">${ICON[i]}${l}</button>`).join("")}</div></nav>
+  <nav class="nav"><div class="in">${[["inicio","Início","home"],["jogo","Jogo","jogo"],["rank","Campeonato","rank"],["mural","Resenha","mural"],["turma","Turma","turma"]].map(([k,l,i]) => `<button class="${S.view===k?'on':''}" data-act="view" data-v="${k}">${ICON[i]}${l}</button>`).join("")}</div></nav>
   ${(!S.me || S.sheet==="who")? vWho():""}
   ${S.toast? `<div class="toast" role="status">${esc(S.toast)}</div>`:""}`;
   if (focusSel) { const el = root.querySelector(`[data-bind="${focusSel}"]`); if (el) { el.focus(); try { if (caret != null) el.setSelectionRange(caret, caret); } catch(e){} } }
@@ -615,13 +673,19 @@ function render(){
 }
 
 /* ---------- ações ---------- */
-function setBind(path, val){ if (path.startsWith("outro.")) S.f.outro[path.slice(6)] = val; else S.f[path] = val; }
+function setBind(path, val){ if (path.startsWith("outro.")) S.f.outro[path.slice(6)] = val; else if (path.startsWith("cmt.")) { S.f.cmt = S.f.cmt || {}; S.f.cmt[path.slice(4)] = val; } else S.f[path] = val; }
 document.addEventListener("input", e => { const b = e.target.dataset && e.target.dataset.bind; if (!b) return; setBind(b, e.target.type === "checkbox" ? e.target.checked : e.target.value); if (e.target.dataset.rerender || e.target.type === "date") render(); });
 document.addEventListener("change", e => {
   const el = e.target;
+  if (el.id === "fotoIn" && el.files && el.files[0]) {
+    const f = el.files[0];
+    compressImage(f).then(r => { if (S.f.newPhoto) URL.revokeObjectURL(S.f.newPhoto.url); S.f.newPhoto = {blob:r.blob, url:URL.createObjectURL(r.blob)}; S.f.compose = true; render(); }).catch(err => toast("Não deu: " + err.message));
+    return;
+  }
   if (el.dataset.actChange === "pickChamp") { S.champ = el.value; S.day = "mes"; render(); return; }
   if (el.dataset.bind) { setBind(el.dataset.bind, el.type === "checkbox" ? el.checked : el.value); if (el.dataset.rerender) render(); }
 });
+document.addEventListener("dblclick", e => { const im = e.target.closest("[data-dbl]"); if (im) toggleLike(im.dataset.dbl, true); });
 document.addEventListener("click", e => {
   const el = e.target.closest("[data-act]"); if (!el) return;
   const a = el.dataset.act; const d = el.dataset;
@@ -647,8 +711,14 @@ document.addEventListener("click", e => {
     case "score": S.f[d.k] = Number(d.v); render(); break;
     case "saveGame": saveGame(); break;
     case "delGame": act(() => DB.remove("partidas", d.id), "Jogo excluído"); break;
-    case "post": { const tx = S.f.post.trim(); if (!tx) return; if (!S.me) { S.sheet = "who"; return render(); } S.f.post = ""; act(() => DB.insert("mural", {autor:S.me, texto:tx}), "Publicado"); break; }
-    case "delPost": act(() => DB.remove("mural", d.id)); break;
+    case "compose": S.f.compose = true; render(); break;
+    case "composeCancel": if (S.f.newPhoto) URL.revokeObjectURL(S.f.newPhoto.url); S.f.newPhoto = null; S.f.compose = false; S.f.post = ""; render(); break;
+    case "post": publish(); break;
+    case "delPost": { const p = S.data.mural.find(x => x.id === d.id); act(async () => { await DB.remove("mural", d.id); if (p && p.foto) await removePhoto(p.foto); }, "Publicação apagada"); break; }
+    case "like": toggleLike(d.id); break;
+    case "openC": S.f.openC = S.f.openC === d.id ? null : d.id; render(); { const inp = document.querySelector(`[data-bind="cmt.${d.id}"]`); if (inp && S.f.openC) inp.focus(); } break;
+    case "sendC": { const tx = ((S.f.cmt||{})[d.id]||"").trim(); if (!tx) return; if (!S.me) { S.sheet = "who"; return render(); } S.f.cmt[d.id] = ""; act(() => DB.insert("comentarios", {post_id:d.id, autor:S.me, texto:tx})); break; }
+    case "delC": act(() => DB.remove("comentarios", d.id)); break;
     case "addMember": addMember(); break;
     case "delMember": act(() => DB.update("turmas", t.id, {membros: t.membros.filter(n => n !== d.n)}), d.n+" saiu da turma"); break;
     case "saveTurma": { const hi = document.getElementById("ti").value, hf = document.getElementById("tf").value, v = Math.max(2, Number(document.getElementById("tv").value)||t.vagas), l = document.getElementById("tl").value; act(() => DB.update("turmas", t.id, {hora_inicio:hi, hora_fim:hf, vagas:v, local:l}), "Turma atualizada"); break; }
@@ -687,6 +757,30 @@ function saveGame(){
   const back = S.f.fromDraw;
   if (back) { S.f.a1 = S.f.a2 = S.f.b1 = S.f.b2 = ""; S.f.fromDraw = false; }
   act(async () => { await DB.insert("partidas", row); if (back) { S.view = "jogo"; } }, "Placar salvo. Ranking atualizado.");
+}
+async function publish(){
+  if (!S.me) { S.sheet = "who"; return render(); }
+  const tx = S.f.post.trim(); const np = S.f.newPhoto;
+  if (!tx && !np) return toast("Escolha uma foto ou escreva algo.");
+  S.f.posting = true; render();
+  try {
+    const row = {autor:S.me, texto:tx};
+    if (np) row.foto = await uploadPhoto(np.blob);
+    await DB.insert("mural", row);
+    if (np) URL.revokeObjectURL(np.url);
+    S.f.newPhoto = null; S.f.compose = false; S.f.post = "";
+    await refresh(); toast("Publicado");
+  } catch(e){ console.error(e); toast("Não deu certo: " + (e.message || "erro")); }
+  S.f.posting = false; render();
+}
+function toggleLike(id, onlyAdd){
+  if (S.noSocial) return; if (!S.me) { S.sheet = "who"; return render(); }
+  const p = S.data.mural.find(x => x.id === id); if (!p) return;
+  const cur = Array.isArray(p.curtidas) ? p.curtidas : [];
+  if (onlyAdd && cur.includes(S.me)) return;
+  const next = cur.includes(S.me) ? cur.filter(n => n !== S.me) : cur.concat(S.me);
+  p.curtidas = next; render();
+  act(() => DB.update("mural", id, {curtidas: next}));
 }
 function doDraw(t){
   const date = nextDate(t); const pick = (S.f.drawPick||[]).slice();
