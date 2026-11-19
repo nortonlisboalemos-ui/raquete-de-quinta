@@ -583,7 +583,7 @@ function vMural(){
   const composer = S.f.compose || np ? `<section class="card col">
       <div class="row">${av(S.me||"?")}<b style="flex:1">Nova publicação</b><button class="btn ghost small" data-act="composeCancel">Cancelar</button></div>
       ${np? `<img src="${np.url}" alt="Prévia da foto" style="width:100%;max-height:420px;object-fit:cover;border-radius:12px">` : ''}
-      ${S.noSocial? '' : `<label class="btn ${np?'ghost':'sand'} small" for="fotoIn" style="cursor:pointer">${np?'Trocar foto':'Escolher foto (câmera ou galeria)'}</label><input type="file" id="fotoIn" accept="image/*" style="display:none">`}
+      ${S.noSocial? '' : (S.f.loadingPhoto? '<div class="muted" style="text-align:center;padding:10px">Preparando a foto…</div>' : `<button class="btn ${np?'ghost':'sand'} small" data-act="pickPhoto">${np?'Trocar foto':'Escolher foto (câmera ou galeria)'}</button>`)}
       <textarea class="f" id="post" data-bind="post" placeholder="${np?'Escreva uma legenda…':'Resenha, recado, provocação saudável…'}">${esc(S.f.post)}</textarea>
       <button class="btn" data-act="post" ${S.f.posting?'disabled':''}>${S.f.posting?'Publicando…':'Publicar'}</button>
     </section>`
@@ -677,14 +677,25 @@ function setBind(path, val){ if (path.startsWith("outro.")) S.f.outro[path.slice
 document.addEventListener("input", e => { const b = e.target.dataset && e.target.dataset.bind; if (!b) return; setBind(b, e.target.type === "checkbox" ? e.target.checked : e.target.value); if (e.target.dataset.rerender || e.target.type === "date") render(); });
 document.addEventListener("change", e => {
   const el = e.target;
-  if (el.id === "fotoIn" && el.files && el.files[0]) {
-    const f = el.files[0];
-    compressImage(f).then(r => { if (S.f.newPhoto) URL.revokeObjectURL(S.f.newPhoto.url); S.f.newPhoto = {blob:r.blob, url:URL.createObjectURL(r.blob)}; S.f.compose = true; render(); }).catch(err => toast("Não deu: " + err.message));
-    return;
-  }
   if (el.dataset.actChange === "pickChamp") { S.champ = el.value; S.day = "mes"; render(); return; }
   if (el.dataset.bind) { setBind(el.dataset.bind, el.type === "checkbox" ? el.checked : el.value); if (el.dataset.rerender) render(); }
 });
+// campo de foto fixo, fora da área que a tela redesenha (a atualização automática não o apaga)
+const PHOTO_IN = document.createElement("input");
+PHOTO_IN.type = "file"; PHOTO_IN.accept = "image/*"; PHOTO_IN.style.cssText = "position:fixed;left:-9999px;width:1px;height:1px;opacity:0";
+document.body.appendChild(PHOTO_IN);
+function onPhotoPicked(){
+  const f = PHOTO_IN.files && PHOTO_IN.files[0];
+  S.picking = false;
+  if (!f) return;
+  S.f.compose = true; S.f.loadingPhoto = true; render();
+  compressImage(f)
+    .then(r => { if (S.f.newPhoto) URL.revokeObjectURL(S.f.newPhoto.url); S.f.newPhoto = {blob:r.blob, url:URL.createObjectURL(r.blob)}; })
+    .catch(err => toast("Não consegui abrir a foto: " + err.message))
+    .finally(() => { PHOTO_IN.value = ""; S.f.loadingPhoto = false; S.view = "mural"; render(); });
+}
+PHOTO_IN.addEventListener("change", onPhotoPicked);
+PHOTO_IN.addEventListener("cancel", () => { S.picking = false; });
 document.addEventListener("dblclick", e => { const im = e.target.closest("[data-dbl]"); if (im) toggleLike(im.dataset.dbl, true); });
 document.addEventListener("click", e => {
   const el = e.target.closest("[data-act]"); if (!el) return;
@@ -712,6 +723,7 @@ document.addEventListener("click", e => {
     case "saveGame": saveGame(); break;
     case "delGame": act(() => DB.remove("partidas", d.id), "Jogo excluído"); break;
     case "compose": S.f.compose = true; render(); break;
+    case "pickPhoto": S.picking = true; S.f.compose = true; PHOTO_IN.value = ""; PHOTO_IN.click(); break;
     case "composeCancel": if (S.f.newPhoto) URL.revokeObjectURL(S.f.newPhoto.url); S.f.newPhoto = null; S.f.compose = false; S.f.post = ""; render(); break;
     case "post": publish(); break;
     case "delPost": { const p = S.data.mural.find(x => x.id === d.id); act(async () => { await DB.remove("mural", d.id); if (p && p.foto) await removePhoto(p.foto); }, "Publicação apagada"); break; }
@@ -806,7 +818,8 @@ function newTurma(){
 
 /* ---------- início ---------- */
 refresh();
-if (ONLINE) { setInterval(() => { if (document.visibilityState === "visible" && !document.activeElement.dataset.bind) refresh(); }, 30000); document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); }); }
+const busy = () => S.picking || S.f.compose || S.f.loadingPhoto || S.f.posting;
+if (ONLINE) { setInterval(() => { if (document.visibilityState === "visible" && !document.activeElement.dataset.bind && !busy()) refresh(); }, 30000); document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && !busy()) refresh(); }); }
 </script>
 </body>
 </html>
