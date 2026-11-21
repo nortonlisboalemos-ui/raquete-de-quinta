@@ -167,7 +167,8 @@ html.hbpage,html.hbpage body{background:#fff}
 .hb-leg tr.tot td{font-weight:800;color:#102F28}
 .hb-leg .sq{display:inline-block;width:10px;height:10px;margin-right:8px;vertical-align:middle}
 .hb-leg .ln{display:inline-block;width:18px;height:3px;background:#53A640;margin-right:8px;vertical-align:middle}
-.hb-games{display:flex;flex-direction:column;gap:8px}
+.hb-games{display:grid;grid-template-columns:1fr;gap:8px}
+@media (min-width:700px){.hb-games{grid-template-columns:1fr 1fr}}
 .hb-game{border:1px solid #DFE7E2;border-radius:14px;background:#fff;padding:9px 10px 10px}
 .hb-game .r{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#102F28;line-height:1.35}
 .hb-game strong{color:#626F6A;font-weight:700}
@@ -273,6 +274,17 @@ const S = {
   confirm: null, sheet: null, toast: "", toastT: null
 };
 function toast(msg){ S.toast = msg; clearTimeout(S.toastT); S.toastT = setTimeout(() => { S.toast = ""; render(); }, 2600); render(); }
+/* importação única dos jogos de 19/11 do app antigo (será removida) */
+async function importOnce(){
+  if (!/[?&]importar=19-11\b/.test(location.search) || !ONLINE) return;
+  const novos = [[19,'Hercílio','Felipe','Norton','Geraldo',4,2],[20,'Hercílio','Alexandre','Norton','Hemerson',2,4],[21,'Felipe','Alexandre','Hercílio','Geraldo',0,4],[22,'Geraldo','Hemerson','Hercílio','Norton',1,4],[23,'Hercílio','Hemerson','Alexandre','Geraldo',3,4],[24,'Felipe','Geraldo','Alexandre','Hemerson',4,1],[25,'Felipe','Hemerson','Norton','Alexandre',4,0],[26,'Norton','Felipe','Hercílio','Geraldo',3,4],[27,'Norton','Hemerson','Felipe','Alexandre',4,1]];
+  const { data: ex, error } = await sb.from("partidas").select("numero").eq("campeonato_id","nov-qui");
+  if (error) { S.importMsg = "Importação falhou: " + error.message; return; }
+  const tem = new Set((ex||[]).map(x => x.numero));
+  const rows = novos.filter(r => !tem.has(r[0])).map(([numero,a1,a2,b1,b2,placar_a,placar_b]) => ({campeonato_id:"nov-qui", numero, data:"2026-11-19", a1, a2, b1, b2, placar_a, placar_b}));
+  if (rows.length) { const { error: e2 } = await sb.from("partidas").insert(rows); if (e2) { S.importMsg = "Importação falhou: " + e2.message; return; } }
+  S.importMsg = "IMPORTACAO OK: " + rows.length + " jogos inseridos, " + (novos.length - rows.length) + " já existiam.";
+}
 async function refresh(){
   try { S.data = await DB.loadAll(); S.err = ""; S.loadedAt = Date.now(); }
   catch(e){ S.err = "Não consegui falar com o servidor. Confira a internet e tente de novo."; console.error(e); }
@@ -674,9 +686,9 @@ function vRank(){
   <a class="hb-old" href="${OLD_APP}" target="_blank" rel="noopener">Abrir no app antigo (HBJr) ↗</a></div>`;
   if (tab === "jogos") {
     const list = games.filter(g => S.day === "mes" || iso(g.data) === S.day);
-    return head + `<div class="hb-games">${list.map(g => { const aw = g.placar_a > g.placar_b; const sub = [g.a1,g.a2,g.b1,g.b2].filter(x => !(c.jogadores||[]).includes(x));
+    return head + `<div class="hb-games">${list.map((g, gi) => { const aw = g.placar_a > g.placar_b; const sub = [g.a1,g.a2,g.b1,g.b2].filter(x => !(c.jogadores||[]).includes(x));
       return `<article class="hb-game"><div class="r"><span>${esc(g.a1)} / ${esc(g.a2)}</span><strong class="${aw?'w':''}">${g.placar_a}</strong></div><div class="r"><span>${esc(g.b1)} / ${esc(g.b2)}</span><strong class="${!aw?'w':''}">${g.placar_b}</strong></div>
-      <div class="m"><span class="badge">Jogo ${g.numero||""}</span><span class="meta">Finalizado · ${iso(g.data)}${sub.length? ' · fora do ranking: '+sub.map(esc).join(", "):""}</span>
+      <div class="m"><span class="badge">Jogo ${S.day==="mes" ? (g.numero||"") : gi+1}</span><span class="meta">Finalizado · ${iso(g.data)}${sub.length? ' · fora do ranking: '+sub.map(esc).join(", "):""}</span>
       ${S.confirm === "g:"+g.id ? `<button class="hb-del on" data-act="delGame" data-id="${esc(g.id)}">Confirmar exclusão</button>` : `<button class="hb-del" data-act="ask" data-id="g:${esc(g.id)}">Excluir</button>`}</div></article>`; }).join("") || '<p class="hb-foot">Sem jogos neste dia.</p>'}</div>` + foot;
   }
   const r = ranking(c, S.day);
@@ -808,6 +820,7 @@ function render(){
   <nav class="turmas" aria-label="Turmas">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill" data-act="view" data-v="turma" aria-label="Nova turma">+</button></nav></header>
   ${ONLINE? "": '<div class="demo">Modo demonstração: os dados ficam só neste aparelho. Com o Supabase ligado, tudo passa a ser da turma.</div>'}
   ${S.err? `<div class="demo">${esc(S.err)}</div>`:""}
+  ${S.importMsg? `<div class="demo" id="importMsg">${esc(S.importMsg)}</div>`:""}
   <main>${(views[S.view]||vMural)()}</main>
   <nav class="nav"><div class="in">${[["mural","Resenha","mural"],["jogo","Jogo de hoje","jogo"],["rank","Campeonato","rank"],["turma","Turma","turma"]].map(([k,l,i]) => `<button class="${S.view===k?'on':''} ${k==='mural'?'hot':''}" data-act="view" data-v="${k}" ${S.view===k?'aria-current="page"':''}><span class="ico">${k==='mural'? ICON_RESENHA : ICON[i]}</span>${l}</button>`).join("")}</div></nav>
   ${(!S.me || S.sheet==="who")? vWho():""}
@@ -992,7 +1005,7 @@ function newTurma(){
 }
 
 /* ---------- início ---------- */
-refresh();
+importOnce().catch(e => { S.importMsg = 'Importação falhou: ' + e.message; }).finally(refresh);
 const busy = () => S.picking || S.f.compose || S.f.loadingPhoto || S.f.posting;
 if (ONLINE) { setInterval(() => { if (document.visibilityState === "visible" && !document.activeElement.dataset.bind && !busy()) refresh(); }, 30000); document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && !busy()) refresh(); }); }
 </script>
