@@ -539,7 +539,7 @@ function vJogo(){
   const subsPres = L.pres.filter(p => p.tipo !== "membro");
   const drawn = !!sorteioOf(t, date) && !S.f.redraw;
   return `
-  <div><div class="kick">${esc(t.nome)} · ${DIAS[t.dia_semana]} ${ddmm(date)}</div><h2>${date===today()?"Jogo de hoje":"Próximo jogo"}</h2><div class="muted">${hm(t.hora_inicio)} às ${hm(t.hora_fim)} · ${esc(t.local||"")} · ${t.vagas} vagas</div></div>
+  <div><h2>${date===today()?"Jogo de hoje":"Próximo jogo"} - ${DIAS[t.dia_semana][0].toUpperCase()+DIAS[t.dia_semana].slice(1)} ${ddmm(date)}</h2><div class="muted">${hm(t.hora_inicio)} às ${hm(t.hora_fim)} · ${esc(t.local||"")} · ${t.vagas} vagas</div></div>
   ${drawn? vDia(t) : ''}
   <section class="card col">
     <div class="row" style="justify-content:space-between"><h3>Presença</h3><b>${L.inGame.length} de ${t.vagas}</b></div>
