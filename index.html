@@ -397,9 +397,11 @@ function sortear(players, rounds){
 /* SORTEIO_END */
 const LOCAL_SORT = "panelinha-sorteio-";
 function sorteioOf(t, date){
+  // só vale o sorteio feito no próprio dia do jogo; sorteio feito antes (teste, engano) é ignorado
+  const valido = x => x && x.created_at && ymd(new Date(x.created_at)) >= date;
   const r = (S.data.sorteios||[]).find(x => x.turma_id === t.id && String(x.data).slice(0,10) === date);
-  if (r) return r;
-  try { const l = JSON.parse(store.get(LOCAL_SORT+t.id+"-"+date)); if (l && l.jogos) return Object.assign({local:true}, l); } catch(e){}
+  if (r) return valido(r) ? r : null;
+  try { const l = JSON.parse(store.get(LOCAL_SORT+t.id+"-"+date)); if (l && l.jogos && valido(l)) return Object.assign({local:true}, l); } catch(e){}
   return null;
 }
 function drawStatus(t, date, jogos){
@@ -610,7 +612,9 @@ function scoreBtns(k){ let h = ""; for (let v = 0; v <= 7; v++) h += `<button cl
 function vDia(t){
   const date = nextDate(t); const L = lineup(t, date); const c = currentChamp(t.id);
   const manual = S.f.manual && c ? (S.champ = c.id, vLancar(c)) : "";
-  return vSorteio(t, date, L) + (c ? `<button class="btn ghost small" data-act="manual">${S.f.manual? 'Fechar jogo fora do sorteio' : '+ Lançar jogo fora do sorteio'}</button>` : '') + manual;
+  const sorteio = date === today() ? vSorteio(t, date, L)
+    : `<section class="card col"><b style="font-size:16px">Sorteio dos jogos</b><span class="muted">O sorteio abre no dia do jogo (${DIAS[t.dia_semana].toLowerCase()} ${ddmm(date)}). Até lá, marque a presença acima.</span></section>`;
+  return sorteio + (c ? `<button class="btn ghost small" data-act="manual">${S.f.manual? 'Fechar jogo fora do sorteio' : '+ Lançar jogo fora do sorteio'}</button>` : '') + manual;
 }
 
 /* ---------- Campeonato no padrão do app HBJr ---------- */
