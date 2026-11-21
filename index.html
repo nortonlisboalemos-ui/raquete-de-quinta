@@ -188,7 +188,9 @@ html.hbpage,html.hbpage body{background:#fff}
 .brand h1 .sub{display:block;font-family:Inter,sans-serif;font-weight:700;font-size:13px;color:var(--sand);margin-top:3px;letter-spacing:.2px}
 .top.nopills{padding-bottom:12px}
 .top{padding-top:12px}
-.res-title{margin:2px 0 0;font:800 26px/1.15 'Bricolage Grotesque',Inter,sans-serif;color:#E8693F;background:linear-gradient(90deg,#E8693F 0%,#D9572B 45%,#2E7562 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.2px}
+.res-title{margin:6px 0 2px;text-align:center;font:800 22px/1.2 'Bricolage Grotesque',Inter,sans-serif;color:#2F7764;letter-spacing:.2px}
+.res-title::after{content:"";display:block;width:64px;height:3px;border-radius:2px;margin:7px auto 0;background:linear-gradient(90deg,#2F7764,#6DB39A)}
+.btn.soft{background:linear-gradient(180deg,#4A967F,#5EA78E);box-shadow:0 2px 8px rgba(46,117,98,.18)}
 </style>
 </head>
 <body>
@@ -754,7 +756,7 @@ function vMural(){
       <textarea class="f" id="post" data-bind="post" placeholder="${np?'Escreva uma legenda…':'Resenha, recado, provocação saudável…'}">${esc(S.f.post)}</textarea>
       <button class="btn" data-act="post" ${S.f.posting?'disabled':''}>${S.f.posting? (np && np.video? 'Enviando o vídeo… não feche o app':'Publicando…') :'Publicar'}</button>
     </section>`
-    : `<button class="btn" data-act="compose" style="width:100%">+ Nova publicação</button>`;
+    : `<button class="btn soft" data-act="compose" style="width:100%">+ Nova publicação</button>`;
   return `<h2 class="res-title">Nossas Resenhas</h2>
   ${S.noSocial && ONLINE? '<div class="demo" style="border-radius:12px">Fotos, curtidas e comentários ainda não foram ativados no banco. Por enquanto dá para publicar texto.</div>':''}
   ${composer}
