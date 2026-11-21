@@ -810,7 +810,7 @@ function render(){
   const views = {inicio:vInicio, jogo:vJogo, rank:vRank, mural:vMural, turma:vTurma};
   const scrollY = window.scrollY; const ae = document.activeElement; const focusSel = ae && ae.dataset && ae.dataset.bind ? ae.dataset.bind : null; const caret = ae && ae.selectionStart;
   root.innerHTML = `
-  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panelinha</h1>' : '<h1><small>PANELINHA</small>Raquete de Quinta</h1>'}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
+  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panelinha</h1>' : `<h1><small>PANELINHA</small>Raquete de ${esc(t.nome)}</h1>`}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
   ${S.view==="mural" ? "" : `<nav class="turmas" aria-label="Turmas">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill" data-act="view" data-v="turma" aria-label="Nova turma">+</button></nav>`}</header>
   ${ONLINE? "": '<div class="demo">Modo demonstração: os dados ficam só neste aparelho. Com o Supabase ligado, tudo passa a ser da turma.</div>'}
   ${S.err? `<div class="demo">${esc(S.err)}</div>`:""}
