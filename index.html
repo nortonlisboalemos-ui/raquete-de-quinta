@@ -181,6 +181,8 @@ html.hbpage,html.hbpage body{background:#fff}
 .hb-foot{margin:4px 0 0;font-size:13px;color:#505F59}
 .hb-old{font-size:13px;font-weight:700;color:#1F7157}
 .brand h1.solo{font-size:22px;padding:4px 0}
+.tpill.novo{border-style:dashed;font-size:13px}
+.tlabel{padding:8px 0 0;font-size:12px;font-weight:600;color:var(--sand);letter-spacing:.3px}
 </style>
 </head>
 <body>
@@ -785,11 +787,11 @@ function vTurma(){
     <div class="grid2"><input class="f" type="date" data-bind="champIni" value="${esc(S.f.champIni)}" aria-label="Início"><input class="f" type="date" data-bind="champFim" value="${esc(S.f.champFim)}" aria-label="Fim"></div>
     <button class="btn" data-act="newChamp">Criar campeonato com os jogadores fixos</button>
   </section>
-  <section class="card col"><h3>Nova turma</h3>
-    <input class="f" data-bind="tNome" value="${esc(S.f.tNome)}" placeholder="Nome (ex.: Sábado)">
+  <section class="card col" id="novoDia"><h3>Novo dia de jogo</h3><span class="muted">Cria outra turma da panelinha, com dia, horário e vagas próprios. Ela aparece nos botões do topo.</span>
+    <input class="f" data-bind="tNome" value="${esc(S.f.tNome)}" placeholder="Nome do dia (ex.: Sábado)">
     <div class="grid2"><select class="f" data-bind="tDia">${DIAS.map((d,i) => `<option value="${i}" ${String(i)===S.f.tDia?'selected':''}>${d}</option>`).join("")}</select><input class="f" type="number" data-bind="tVagas" value="${esc(S.f.tVagas)}" aria-label="Vagas"></div>
     <div class="grid2"><input class="f" type="time" data-bind="tIni" value="${esc(S.f.tIni)}" aria-label="Início"><input class="f" type="time" data-bind="tFim" value="${esc(S.f.tFim)}" aria-label="Fim"></div>
-    <button class="btn ghost" data-act="newTurma">Criar turma (você entra como membro)</button>
+    <button class="btn" data-act="newTurma">Criar dia de jogo (você entra como jogador)</button>
   </section>
   <section class="card col"><h3>Transição do app antigo</h3><span class="muted">Outubro e novembro já foram importados do HBJr e conferidos. O app antigo continua disponível para consulta.</span><a class="btn ghost small" href="${OLD_APP}" target="_blank" rel="noopener">Abrir app antigo (HBJr) ↗</a></section>`;
 }
@@ -810,8 +812,8 @@ function render(){
   const views = {inicio:vInicio, jogo:vJogo, rank:vRank, mural:vMural, turma:vTurma};
   const scrollY = window.scrollY; const ae = document.activeElement; const focusSel = ae && ae.dataset && ae.dataset.bind ? ae.dataset.bind : null; const caret = ae && ae.selectionStart;
   root.innerHTML = `
-  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panelinha</h1>' : `<h1><small>PANELINHA</small>Raquete de ${esc(t.nome)}</h1>`}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
-  ${S.view==="mural" ? "" : `<nav class="turmas" aria-label="Turmas">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill" data-act="view" data-v="turma" aria-label="Nova turma">+</button></nav>`}</header>
+  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panelinha</h1>' : (S.view==="turma" ? '<h1><small>PANELINHA</small>Toda a turma</h1>' : `<h1><small>PANELINHA</small>Raquete de ${esc(t.nome)}</h1>`)}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
+  ${S.view==="mural" ? "" : `${S.view==="turma" ? '<div class="tlabel">Selecione o dia do jogo</div>' : ''}<nav class="turmas" aria-label="Dias de jogo">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill novo" data-act="newDay">+ Novo dia de jogo</button></nav>`}</header>
   ${ONLINE? "": '<div class="demo">Modo demonstração: os dados ficam só neste aparelho. Com o Supabase ligado, tudo passa a ser da turma.</div>'}
   ${S.err? `<div class="demo">${esc(S.err)}</div>`:""}
   <main>${(views[S.view]||vMural)()}</main>
@@ -885,6 +887,7 @@ document.addEventListener("click", e => {
     case "saveGame": saveGame(); break;
     case "delGame": act(() => DB.remove("partidas", d.id), "Jogo excluído"); break;
     case "compose": S.f.compose = true; render(); break;
+    case "newDay": S.view = "turma"; render(); { const el = document.getElementById("novoDia"); if (el) { el.scrollIntoView({behavior:"smooth", block:"start"}); const i = el.querySelector("input"); if (i) setTimeout(() => i.focus(), 400); } } break;
     case "pickPhoto": S.picking = true; S.f.compose = true; PHOTO_IN.value = ""; PHOTO_IN.click(); break;
     case "composeCancel": if (S.f.newPhoto) URL.revokeObjectURL(S.f.newPhoto.url); S.f.newPhoto = null; S.f.compose = false; S.f.post = ""; render(); break;
     case "post": publish(); break;
