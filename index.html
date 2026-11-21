@@ -185,6 +185,7 @@ html.hbpage,html.hbpage body{background:#fff}
 .tlabel{padding:8px 0 0;font-size:12px;font-weight:600;color:var(--sand);letter-spacing:.3px}
 .turmas.wrapx{flex-wrap:wrap;overflow:visible}
 .turmas.wrapx .tpill{min-height:36px;padding:0 13px;font-size:13.5px}
+.brand h1 .sub{display:block;font-family:Inter,sans-serif;font-weight:700;font-size:13px;color:var(--sand);margin-top:3px;letter-spacing:.2px}
 </style>
 </head>
 <body>
@@ -848,8 +849,8 @@ function render(){
   const views = {inicio:vInicio, jogo:vJogo, rank:vRank, mural:vMural, turma:vTurma};
   const scrollY = window.scrollY; const ae = document.activeElement; const focusSel = ae && ae.dataset && ae.dataset.bind ? ae.dataset.bind : null; const caret = ae && ae.selectionStart;
   root.innerHTML = `
-  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panela</h1>' : (S.view==="turma" ? '<h1 class="solo">Panela Completa</h1>' : `<h1><small>PANELINHA</small>Raquete de ${esc(t.nome)}</h1>`)}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
-  ${S.view==="mural" ? "" : `${S.view==="turma" ? '<div class="tlabel">Selecione a panelinha abaixo</div>' : ''}<nav class="turmas ${S.view==="turma"?"wrapx":""}" aria-label="Dias de jogo">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id && !(S.view==="turma" && S.panela)?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill novo" data-act="newDay">+ Novo dia de jogo</button>${S.view==="turma" ? `<button class="tpill ${S.panela?'on':''}" data-act="panela">Toda a panela</button>` : ''}</nav>`}</header>
+  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panela</h1>' : (S.view==="turma" ? '<h1 class="solo">Panela Completa</h1>' : `<h1>Nossas Panelas<span class="sub">Panelinha de ${esc(t.nome)}</span></h1>`)}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
+  ${S.view==="mural" ? "" : `<div class="tlabel">${S.view==="turma" ? 'Selecione a panelinha abaixo' : 'Selecione a panelinha'}</div><nav class="turmas ${S.view==="turma"?"wrapx":""}" aria-label="Dias de jogo">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id && !(S.view==="turma" && S.panela)?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill novo" data-act="newDay">+ Novo dia de jogo</button>${S.view==="turma" ? `<button class="tpill ${S.panela?'on':''}" data-act="panela">Toda a panela</button>` : ''}</nav>`}</header>
   ${ONLINE? "": '<div class="demo">Modo demonstração: os dados ficam só neste aparelho. Com o Supabase ligado, tudo passa a ser da turma.</div>'}
   ${S.err? `<div class="demo">${esc(S.err)}</div>`:""}
   <main>${(views[S.view]||vMural)()}</main>
