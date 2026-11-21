@@ -188,6 +188,7 @@ html.hbpage,html.hbpage body{background:#fff}
 .brand h1 .sub{display:block;font-family:Inter,sans-serif;font-weight:700;font-size:13px;color:var(--sand);margin-top:3px;letter-spacing:.2px}
 .top.nopills{padding-bottom:12px}
 .top{padding-top:12px}
+.res-title{margin:2px 0 0;font:800 26px/1.15 'Bricolage Grotesque',Inter,sans-serif;color:#E8693F;background:linear-gradient(90deg,#E8693F 0%,#D9572B 45%,#2E7562 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.2px}
 </style>
 </head>
 <body>
@@ -754,7 +755,7 @@ function vMural(){
       <button class="btn" data-act="post" ${S.f.posting?'disabled':''}>${S.f.posting? (np && np.video? 'Enviando o vídeo… não feche o app':'Publicando…') :'Publicar'}</button>
     </section>`
     : `<button class="btn" data-act="compose" style="width:100%">+ Nova publicação</button>`;
-  return `<div class="row" style="justify-content:space-between"><div><div class="kick">Quinta e segunda</div><h2>Resenha</h2></div></div>
+  return `<h2 class="res-title">Nossas Resenhas</h2>
   ${S.noSocial && ONLINE? '<div class="demo" style="border-radius:12px">Fotos, curtidas e comentários ainda não foram ativados no banco. Por enquanto dá para publicar texto.</div>':''}
   ${composer}
   ${posts.map(p => {
