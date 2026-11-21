@@ -848,12 +848,12 @@ function render(){
   const views = {inicio:vInicio, jogo:vJogo, rank:vRank, mural:vMural, turma:vTurma};
   const scrollY = window.scrollY; const ae = document.activeElement; const focusSel = ae && ae.dataset && ae.dataset.bind ? ae.dataset.bind : null; const caret = ae && ae.selectionStart;
   root.innerHTML = `
-  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panelinha</h1>' : (S.view==="turma" ? '<h1 class="solo">Nossa Panelinha</h1>' : `<h1><small>PANELINHA</small>Raquete de ${esc(t.nome)}</h1>`)}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
+  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panela</h1>' : (S.view==="turma" ? '<h1 class="solo">Nossa Panelinha</h1>' : `<h1><small>PANELINHA</small>Raquete de ${esc(t.nome)}</h1>`)}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
   ${S.view==="mural" ? "" : `${S.view==="turma" ? '<div class="tlabel">Selecione o dia do jogo</div>' : ''}<nav class="turmas ${S.view==="turma"?"wrapx":""}" aria-label="Dias de jogo">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id && !(S.view==="turma" && S.panela)?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill novo" data-act="newDay">+ Novo dia de jogo</button>${S.view==="turma" ? `<button class="tpill ${S.panela?'on':''}" data-act="panela">Toda a panela</button>` : ''}</nav>`}</header>
   ${ONLINE? "": '<div class="demo">Modo demonstração: os dados ficam só neste aparelho. Com o Supabase ligado, tudo passa a ser da turma.</div>'}
   ${S.err? `<div class="demo">${esc(S.err)}</div>`:""}
   <main>${(views[S.view]||vMural)()}</main>
-  <nav class="nav"><div class="in">${[["mural","Resenha","mural"],["jogo","Jogo de hoje","jogo"],["rank","Campeonato","rank"],["turma","Panelinha","turma"]].map(([k,l,i]) => `<button class="${S.view===k?'on':''} ${k==='mural'?'hot':''}" data-act="view" data-v="${k}" ${S.view===k?'aria-current="page"':''}><span class="ico">${k==='mural'? ICON_RESENHA : ICON[i]}</span>${l}</button>`).join("")}</div></nav>
+  <nav class="nav"><div class="in">${[["mural","Resenha","mural"],["jogo","Jogo de hoje","jogo"],["rank","Campeonato","rank"],["turma","Toda a Panela","turma"]].map(([k,l,i]) => `<button class="${S.view===k?'on':''} ${k==='mural'?'hot':''}" data-act="view" data-v="${k}" ${S.view===k?'aria-current="page"':''}><span class="ico">${k==='mural'? ICON_RESENHA : ICON[i]}</span>${l}</button>`).join("")}</div></nav>
   ${(!S.me || S.sheet==="who")? vWho():""}
   ${S.toast? `<div class="toast" role="status">${esc(S.toast)}</div>`:""}`;
   document.documentElement.classList.toggle("hbpage", S.view === "rank");
