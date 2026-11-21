@@ -87,15 +87,18 @@ label.l{font-size:13px;font-weight:700}
 .scorebtns{display:flex;gap:4px;flex-wrap:wrap}
 .scorebtns button{width:42px;height:42px;border-radius:10px;border:1px solid #C6D9CF;background:#fff;font-weight:800;font-size:16px;cursor:pointer}
 .scorebtns button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-.nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:#fff;border-top:1px solid var(--line);padding:6px 6px calc(10px + env(safe-area-inset-bottom))}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:#fff;border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(27,74,61,.08);padding:7px 6px calc(10px + env(safe-area-inset-bottom))}
 .nav .in{max-width:560px;margin:0 auto;display:flex;justify-content:space-around}
-.nav button{flex:1;min-height:52px;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer}
+.nav button{flex:1;min-height:58px;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:700;color:#3A5A4F;cursor:pointer;white-space:nowrap}
 .nav button{position:relative}
-.nav .ico{display:flex;align-items:center;justify-content:center;width:56px;height:32px;border-radius:16px;transition:background .15s}
+.nav .ico{position:relative;display:flex;align-items:center;justify-content:center;width:60px;height:34px;border-radius:17px;color:#2A6B59;background:#F1F7F3;transition:background .15s}
 .nav button.on{color:var(--navy);font-weight:800}
-.nav button.on .ico{background:var(--g-soft)}
+.nav button.on .ico{background:#CFE6DA;color:var(--g-top)}
 .nav button.on::before{content:"";position:absolute;top:-7px;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;background:var(--navy)}
-.nav svg{width:22px;height:22px}
+.nav svg{width:25px;height:25px}
+.nav svg *{stroke-width:2.2}
+.nbadge{position:absolute;top:-5px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#E8693F;color:#fff;font-size:10.5px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 0 2px #fff}
+.nbadge.hoje{background:#2E7562;font-size:9.5px;letter-spacing:.3px}
 .post{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-bottom:1px solid #E3EEE8}
 .post:last-child{border-bottom:0}
 .overlay{position:fixed;inset:0;z-index:20;background:rgba(20,33,61,.55);display:flex;align-items:flex-end;justify-content:center}
@@ -111,10 +114,6 @@ label.l{font-size:13px;font-weight:700}
 .fb{display:flex;flex-direction:column;gap:6px;padding:10px 12px 12px}
 .ic{background:none;border:0;padding:4px;margin:-4px;color:var(--ink);cursor:pointer;min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center}
 .lnk{background:none;border:0;padding:0;color:var(--muted);font-size:13px;cursor:pointer;text-align:left}
-.nav button.hot svg{width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(231,111,81,.35))}
-.nav button.hot.on{color:var(--navy)}
-.nav button.hot.on .ico{background:var(--g-soft)}
-.nav button.hot.on::before{background:var(--navy)}
 /* Campeonato: padrão HBJr */
 html.hbpage,html.hbpage body{background:#fff}
 .hb{font-family:Manrope,Inter,system-ui,sans-serif;color:#102F28;display:flex;flex-direction:column;gap:12px}
@@ -493,7 +492,7 @@ const ICON = {
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>',
   jogo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
   rank:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>',
-  mural:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor"/></svg>',
+  mural:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8c5.2 0 9.2 3.5 9.2 7.9s-4 7.9-9.2 7.9c-1 0-1.9-.1-2.8-.4L4.5 20.5l1-3.7C3.9 15.4 2.8 13.2 2.8 10.7 2.8 6.3 6.8 2.8 12 2.8z"/><path d="M7 8.6h2l1-1.4h4l1 1.4h2v5.6H7z"/><circle cx="12" cy="11.3" r="1.7"/></svg>',
   turma:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>'
 };
 const EMBLEM = s => `<svg width="${s}" height="${s}" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#F5F1E8"/><path d="M69.35 60.75A23.5 23.5 0 0 1 57.04 71.08M40.96 71.08A23.5 23.5 0 0 1 33.58 66.74M25.93 53.48A23.5 23.5 0 0 1 25.93 44.52M33.58 31.26A23.5 23.5 0 0 1 40.96 26.92M57.04 26.92A23.5 23.5 0 0 1 69.35 37.25" fill="none" stroke="#1F5C4A" stroke-width="5" stroke-linecap="round"/><g fill="#1F5C4A"><circle cx="49.00" cy="25.50" r="5.9"/><circle cx="28.45" cy="37.61" r="5.9"/><circle cx="28.45" cy="60.39" r="5.9"/><circle cx="49.00" cy="72.50" r="5.9"/></g><circle cx="77" cy="49" r="10" fill="#E8693F"/><path d="M77 43.8v10.4M71.8 49h10.4" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/></svg>`;
@@ -734,6 +733,15 @@ function vLancar(c){
   </section>`;
 }
 
+function navBadge(k){
+  if (k === "mural" && S.view !== "mural") {
+    const visto = Number(store.get("panelinha-resenha-visto") || 0);
+    const novos = visto ? S.data.mural.filter(p => p.autor !== S.me && new Date(p.created_at).getTime() > visto).length : 0;
+    return novos ? `<span class="nbadge">${novos > 9 ? "9+" : novos}</span>` : "";
+  }
+  if (k === "jogo" && S.data.turmas.some(t => nextDate(t) === today())) return `<span class="nbadge hoje">hoje</span>`;
+  return "";
+}
 function vMural(){
   const posts = S.data.mural.slice().sort((a,b) => String(b.created_at).localeCompare(String(a.created_at)));
   const cm = S.data.comentarios || [];
@@ -857,10 +865,11 @@ function render(){
   ${ONLINE? "": '<div class="demo">Modo demonstração: os dados ficam só neste aparelho. Com o Supabase ligado, tudo passa a ser da turma.</div>'}
   ${S.err? `<div class="demo">${esc(S.err)}</div>`:""}
   <main>${(views[S.view]||vMural)()}</main>
-  <nav class="nav"><div class="in">${[["mural","Resenha","mural"],["jogo","Jogo de hoje","jogo"],["rank","Campeonato","rank"],["turma","Toda a Panela","turma"]].map(([k,l,i]) => `<button class="${S.view===k?'on':''} ${k==='mural'?'hot':''}" data-act="view" data-v="${k}" ${S.view===k?'aria-current="page"':''}><span class="ico">${k==='mural'? ICON_RESENHA : ICON[i]}</span>${l}</button>`).join("")}</div></nav>
+  <nav class="nav"><div class="in">${[["mural","Resenha","mural"],["jogo","Jogo de hoje","jogo"],["rank","Campeonato","rank"],["turma","Toda a Panela","turma"]].map(([k,l,i]) => `<button class="${S.view===k?'on':''}" data-act="view" data-v="${k}" ${S.view===k?'aria-current="page"':''}><span class="ico">${ICON[i]}${navBadge(k)}</span>${l}</button>`).join("")}</div></nav>
   ${(!S.me || S.sheet==="who")? vWho():""}
   ${S.toast? `<div class="toast" role="status">${esc(S.toast)}</div>`:""}`;
   document.documentElement.classList.toggle("hbpage", S.view === "rank");
+  if (S.view === "mural") store.set("panelinha-resenha-visto", String(Date.now()));
   if (focusSel) { const el = root.querySelector(`[data-bind="${focusSel}"]`); if (el) { el.focus(); try { if (caret != null) el.setSelectionRange(caret, caret); } catch(e){} } }
   window.scrollTo(0, scrollY);
 }
