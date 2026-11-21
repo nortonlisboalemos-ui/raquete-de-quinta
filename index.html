@@ -180,6 +180,7 @@ html.hbpage,html.hbpage body{background:#fff}
 .hb-del.on{color:#fff;background:#C0392B;border-radius:6px;padding:4px 8px}
 .hb-foot{margin:4px 0 0;font-size:13px;color:#505F59}
 .hb-old{font-size:13px;font-weight:700;color:#1F7157}
+.brand h1.solo{font-size:22px;padding:4px 0}
 </style>
 </head>
 <body>
@@ -737,7 +738,7 @@ function vMural(){
       <button class="btn" data-act="post" ${S.f.posting?'disabled':''}>${S.f.posting? (np && np.video? 'Enviando o vídeo… não feche o app':'Publicando…') :'Publicar'}</button>
     </section>`
     : `<button class="btn" data-act="compose" style="width:100%">+ Nova publicação</button>`;
-  return `<div class="row" style="justify-content:space-between"><div><div class="kick">Raquete de Quinta</div><h2>Resenha</h2></div></div>
+  return `<div class="row" style="justify-content:space-between"><div><div class="kick">Quinta e segunda</div><h2>Resenha</h2></div></div>
   ${S.noSocial && ONLINE? '<div class="demo" style="border-radius:12px">Fotos, curtidas e comentários ainda não foram ativados no banco. Por enquanto dá para publicar texto.</div>':''}
   ${composer}
   ${posts.map(p => {
@@ -809,8 +810,8 @@ function render(){
   const views = {inicio:vInicio, jogo:vJogo, rank:vRank, mural:vMural, turma:vTurma};
   const scrollY = window.scrollY; const ae = document.activeElement; const focusSel = ae && ae.dataset && ae.dataset.bind ? ae.dataset.bind : null; const caret = ae && ae.selectionStart;
   root.innerHTML = `
-  <header class="top"><div class="brand">${EMBLEM(38)}<h1><small>PANELINHA</small>Raquete de Quinta</h1><button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
-  <nav class="turmas" aria-label="Turmas">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill" data-act="view" data-v="turma" aria-label="Nova turma">+</button></nav></header>
+  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panelinha</h1>' : '<h1><small>PANELINHA</small>Raquete de Quinta</h1>'}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
+  ${S.view==="mural" ? "" : `<nav class="turmas" aria-label="Turmas">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill" data-act="view" data-v="turma" aria-label="Nova turma">+</button></nav>`}</header>
   ${ONLINE? "": '<div class="demo">Modo demonstração: os dados ficam só neste aparelho. Com o Supabase ligado, tudo passa a ser da turma.</div>'}
   ${S.err? `<div class="demo">${esc(S.err)}</div>`:""}
   <main>${(views[S.view]||vMural)()}</main>
