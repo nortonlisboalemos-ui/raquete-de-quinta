@@ -183,6 +183,8 @@ html.hbpage,html.hbpage body{background:#fff}
 .brand h1.solo{font-size:22px;padding:4px 0}
 .tpill.novo{border-style:dashed;font-size:13px}
 .tlabel{padding:8px 0 0;font-size:12px;font-weight:600;color:var(--sand);letter-spacing:.3px}
+.turmas.wrapx{flex-wrap:wrap;overflow:visible}
+.turmas.wrapx .tpill{min-height:36px;padding:0 13px;font-size:13.5px}
 </style>
 </head>
 <body>
@@ -760,7 +762,41 @@ function vMural(){
       </div></article>`; }).join("") || '<span class="muted">Nada ainda. Seja o primeiro a postar.</span>'}`;
 }
 
+function panelaNomes(){
+  const ativos = S.data.jogadores.filter(j => j.ativo !== false).map(j => j.nome);
+  return [...new Set([...ativos, ...S.data.turmas.flatMap(x => x.membros||[])])].sort((a,b) => a.localeCompare(b, "pt-BR"));
+}
+function vPanela(){
+  const nomes = panelaNomes(); const ts = S.data.turmas;
+  return `<div><div class="kick">Toda a panela</div><h2>${nomes.length} pessoas na panela</h2><div class="muted">Todo mundo da panelinha, em todos os dias de jogo. Toque num dia para incluir ou tirar a pessoa daquele dia.</div></div>
+  <section class="card col">
+    <div>${nomes.map(n => { const dias = ts.filter(x => (x.membros||[]).includes(n));
+      return `<div class="person" style="flex-wrap:wrap">${av(n)}<span class="pname">${esc(n)}${n===S.me?' <span class="tag">você</span>':''}<span class="muted" style="display:block;font-size:12px;font-weight:500">${dias.length? 'Joga '+dias.map(x => esc(x.nome.toLowerCase())).join(' e ') : 'Ainda sem dia de jogo'}</span></span>
+      ${S.confirm==="pn:"+n ? `<button class="btn danger small" data-act="delPanela" data-n="${esc(n)}">Confirmar</button>` : `<button class="btn ghost small" data-act="ask" data-id="pn:${esc(n)}" aria-label="Tirar ${esc(n)} da panela">Tirar</button>`}
+      <div class="chips" style="flex-basis:100%;padding-left:44px;flex-wrap:wrap">${ts.map(x => { const on = (x.membros||[]).includes(n); return `<button class="chip ${on?'on':''}" data-act="dayToggle" data-t="${esc(x.id)}" data-n="${esc(n)}">${on?'✓ ':'+ '}${esc(x.nome)}</button>`; }).join("")}</div></div>`; }).join("")}</div>
+    <label class="l" for="np">Incluir pessoa na panela</label>
+    <div class="row"><input class="f" id="np" data-bind="newPanela" value="${esc(S.f.newPanela||"")}" placeholder="Nome"><button class="btn small" data-act="addPanela">Incluir</button></div>
+    <span class="muted">Depois de incluir, toque nos dias em que a pessoa joga. Quem é da panela aparece na lista de "Quem é você?" e pode comentar na Resenha.</span>
+  </section>`;
+}
+function dayToggle(tid, n){
+  const x = S.data.turmas.find(z => z.id === tid); if (!x) return;
+  const on = (x.membros||[]).includes(n);
+  act(async () => { if (!on) await ensurePlayer(n); await DB.update("turmas", x.id, {membros: on ? x.membros.filter(m => m !== n) : [...(x.membros||[]), n]}); }, on ? n+" saiu da "+x.nome.toLowerCase() : n+" entrou na "+x.nome.toLowerCase());
+}
+function addPanela(){
+  const n = (S.f.newPanela||"").trim(); if (!n) return toast("Escreva o nome.");
+  const j = S.data.jogadores.find(z => z.nome.toLowerCase() === n.toLowerCase());
+  if (j && j.ativo !== false) return toast(j.nome+" já está na panela.");
+  S.f.newPanela = "";
+  act(async () => { if (j) await DB.update("jogadores", j.id, {ativo:true}); else await DB.insert("jogadores", {nome:n, ativo:true}); }, n+" entrou na panela");
+}
+function delPanela(n){
+  const j = S.data.jogadores.find(z => z.nome === n);
+  act(async () => { if (j) await DB.update("jogadores", j.id, {ativo:false}); for (const x of S.data.turmas) if ((x.membros||[]).includes(n)) await DB.update("turmas", x.id, {membros: x.membros.filter(m => m !== n)}); }, n+" saiu da panela");
+}
 function vTurma(){
+  if (S.panela) return vPanela();
   const t = turmaAtual(); const champs = champsOf(t.id);
   return `<div><div class="kick">Turma</div><h2>${esc(t.nome)} no ${esc(t.local||"")}</h2><div class="muted">Toda ${DIAS[t.dia_semana]} · ${hm(t.hora_inicio)} às ${hm(t.hora_fim)} · ${t.vagas} vagas</div></div>
   <section class="card col"><h3>Jogadores fixos (${t.membros.length})</h3>
@@ -812,8 +848,8 @@ function render(){
   const views = {inicio:vInicio, jogo:vJogo, rank:vRank, mural:vMural, turma:vTurma};
   const scrollY = window.scrollY; const ae = document.activeElement; const focusSel = ae && ae.dataset && ae.dataset.bind ? ae.dataset.bind : null; const caret = ae && ae.selectionStart;
   root.innerHTML = `
-  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panelinha</h1>' : (S.view==="turma" ? '<h1 class="solo">Toda a panelinha</h1>' : `<h1><small>PANELINHA</small>Raquete de ${esc(t.nome)}</h1>`)}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
-  ${S.view==="mural" ? "" : `${S.view==="turma" ? '<div class="tlabel">Selecione o dia do jogo</div>' : ''}<nav class="turmas" aria-label="Dias de jogo">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill novo" data-act="newDay">+ Novo dia de jogo</button></nav>`}</header>
+  <header class="top"><div class="brand">${EMBLEM(38)}${S.view==="mural" ? '<h1 class="solo">Nossa Panelinha</h1>' : (S.view==="turma" ? '<h1 class="solo">Nossa Panelinha</h1>' : `<h1><small>PANELINHA</small>Raquete de ${esc(t.nome)}</h1>`)}<button class="me" data-act="who">${S.me? esc(S.me):"Entrar"}</button></div>
+  ${S.view==="mural" ? "" : `${S.view==="turma" ? '<div class="tlabel">Selecione o dia do jogo</div>' : ''}<nav class="turmas ${S.view==="turma"?"wrapx":""}" aria-label="Dias de jogo">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id && !(S.view==="turma" && S.panela)?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill novo" data-act="newDay">+ Novo dia de jogo</button>${S.view==="turma" ? `<button class="tpill ${S.panela?'on':''}" data-act="panela">Toda a panela</button>` : ''}</nav>`}</header>
   ${ONLINE? "": '<div class="demo">Modo demonstração: os dados ficam só neste aparelho. Com o Supabase ligado, tudo passa a ser da turma.</div>'}
   ${S.err? `<div class="demo">${esc(S.err)}</div>`:""}
   <main>${(views[S.view]||vMural)()}</main>
@@ -868,7 +904,11 @@ document.addEventListener("click", e => {
   switch (a) {
     case "retry": refresh(); break;
     case "view": S.view = d.v; window.scrollTo(0,0); render(); break;
-    case "turma": S.turma = d.id; store.set("panelinha-turma", d.id); S.champ = null; S.day = "mes"; render(); break;
+    case "panela": S.panela = true; S.view = "turma"; window.scrollTo(0,0); render(); break;
+    case "dayToggle": dayToggle(d.t, d.n); break;
+    case "addPanela": addPanela(); break;
+    case "delPanela": delPanela(d.n); break;
+    case "turma": S.panela = false; S.turma = d.id; store.set("panelinha-turma", d.id); S.champ = null; S.day = "mes"; render(); break;
     case "who": S.sheet = "who"; render(); break;
     case "closeWho": S.sheet = null; render(); break;
     case "setMe": S.me = d.n; store.set("panelinha-me", d.n); S.sheet = null; render(); break;
@@ -887,7 +927,7 @@ document.addEventListener("click", e => {
     case "saveGame": saveGame(); break;
     case "delGame": act(() => DB.remove("partidas", d.id), "Jogo excluído"); break;
     case "compose": S.f.compose = true; render(); break;
-    case "newDay": S.view = "turma"; render(); { const el = document.getElementById("novoDia"); if (el) { el.scrollIntoView({behavior:"smooth", block:"start"}); const i = el.querySelector("input"); if (i) setTimeout(() => i.focus(), 400); } } break;
+    case "newDay": S.view = "turma"; S.panela = false; render(); { const el = document.getElementById("novoDia"); if (el) { el.scrollIntoView({behavior:"smooth", block:"start"}); const i = el.querySelector("input"); if (i) setTimeout(() => i.focus(), 400); } } break;
     case "pickPhoto": S.picking = true; S.f.compose = true; PHOTO_IN.value = ""; PHOTO_IN.click(); break;
     case "composeCancel": if (S.f.newPhoto) URL.revokeObjectURL(S.f.newPhoto.url); S.f.newPhoto = null; S.f.compose = false; S.f.post = ""; render(); break;
     case "post": publish(); break;
