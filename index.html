@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#14213D">
 <title>Raquete de Quinta · Panelinha</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--navy:#14213D;--sand:#E9C46A;--coral:#E76F51;--off:#F4F1DE;--bg:#F7F3EC;--line:#E4DCCD;--ink:#1B1F23;--muted:#5B6168;--teal:#0B6E6D;--green:#2F6B45;--rust:#9A3412}
 *{box-sizing:border-box}
@@ -114,6 +114,71 @@ label.l{font-size:13px;font-weight:700}
 .nav button.hot.on{color:#C2410C}
 .nav button.hot.on .ico{background:#FBE0D6}
 .nav button.hot.on::before{background:#E76F51}
+/* Campeonato: padrão HBJr */
+html.hbpage,html.hbpage body{background:#fff}
+.hb{font-family:Manrope,Inter,system-ui,sans-serif;color:#102F28;display:flex;flex-direction:column;gap:12px}
+.hb-lab{font-size:13px;font-weight:700;color:#102F28;display:block;margin-bottom:-6px}
+.hb-day .hb-lab{margin-bottom:4px}
+.hb-sel{width:100%;min-height:46px;border:1px solid #BCC8C2;border-radius:10px;background:#fff;padding:0 12px;font:700 16px Manrope,Inter,sans-serif;color:#102F28}
+.hb-hero{position:relative;overflow:hidden;background:#102F28;color:#fff;border-radius:16px;padding:18px 16px 20px}
+.hb-hero::after{content:"";position:absolute;right:-70px;top:-60px;width:220px;height:220px;border:1px solid rgba(255,255,255,.28);border-radius:50%}
+.hb-kick{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.85}
+.hb-hero h2{margin:8px 0 6px;font:800 22px/1.15 Manrope,Inter,sans-serif;color:#fff}
+.hb-hero p{margin:0;font-size:15px;opacity:.8}
+.hb-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hb-tabs button{min-height:40px;border:0;border-radius:10px;background:#ECF4EF;color:#102F28;font:600 15px Manrope,Inter,sans-serif;box-shadow:0 1px 2px rgba(16,47,40,.12);cursor:pointer}
+.hb-tabs button.on{background:#25745B;color:#fff}
+.hb-tools .hb-sel{font-size:14px;padding:0 8px}
+.hb-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end}
+.hb-upd{min-height:46px;border:0;background:transparent;font:500 15px Manrope,Inter,sans-serif;color:#102F28;cursor:pointer}
+.hb-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;align-items:end;margin-top:6px}
+.hb-podium .pc{display:flex;flex-direction:column;align-items:center;gap:4px}
+.hb-podium .hav{color:#102F28;width:26px;height:26px;border-radius:50%;border:1px solid #CFD8D3;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.hb-podium b{font-size:12px;font-weight:700}
+.hb-podium .blk{width:100%;border-radius:14px 14px 0 0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:700;font-size:13px}
+.hb-podium .p1 .blk{height:66px}.hb-podium .p2 .blk{height:50px}.hb-podium .p3 .blk{height:42px}
+.hb-card{border:1px solid #DFE7E2;border-radius:14px;overflow:hidden;background:#fff;margin-top:-12px}
+.hb-t{width:100%;border-collapse:collapse;font-size:13px}
+.hb-t th{font-weight:500;color:#505F59;padding:9px 6px;text-align:center}
+.hb-t td{padding:9px 6px;text-align:center;border-top:1px solid #DFE7E2;color:#3B4A44}
+.hb-t .l{text-align:left}.hb-t .c{text-align:right;width:34px}
+.hb-t td.pts{color:#1F7157;font-weight:800}
+.hb-t tr.first td{background:#ECF4EF}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.dot.lg{width:13px;height:13px;margin:0 0 3px}
+.hb-sec{border-top:1px solid #DFE7E2;padding-top:14px;display:flex;flex-direction:column;gap:8px}
+.hb-h3{text-transform:none;letter-spacing:0;margin:0;font:800 15px/1.3 Manrope,Inter,sans-serif;color:#102F28}
+.hb-h3 span{color:#505F59;font-weight:700}
+.hb-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.hb-d{border-collapse:collapse;font-size:13px;white-space:nowrap}
+.hb-d th{font-weight:600;color:#505F59;padding:6px 7px;text-align:center;line-height:1.2}
+.hb-d th.l,.hb-d td.l{text-align:left;position:sticky;left:0;background:#fff;z-index:1}
+.hb-d th.g{color:#1F7157}
+.hb-d td{padding:5px 7px;text-align:center;color:#3B4A44;border-bottom:1px solid #fff}
+.hb-d tr.k1 td:not(.l){background:#C2D8D1}.hb-d tr.k2 td:not(.l){background:#ECF4EF}
+.hb-d td b{color:#102F28}
+.hb-note{margin:0;font-size:11px;color:#505F59;line-height:1.45}
+.hb-chart{width:100%;height:auto;display:block}
+.hb-chart .ax{font:500 11px Manrope,Inter,sans-serif;fill:#6B7873}
+.hb-leg{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+.hb-leg th{font-weight:500;color:#102F28;padding:6px 4px;text-align:center}
+.hb-leg td{text-align:center;padding:6px 4px;border-top:1px solid #E4E9E6;color:#3B4A44}
+.hb-leg td.l{text-align:left}
+.hb-leg tr.tot td{font-weight:800;color:#102F28}
+.hb-leg .sq{display:inline-block;width:10px;height:10px;margin-right:8px;vertical-align:middle}
+.hb-leg .ln{display:inline-block;width:18px;height:3px;background:#53A640;margin-right:8px;vertical-align:middle}
+.hb-games{display:flex;flex-direction:column;gap:8px}
+.hb-game{border:1px solid #DFE7E2;border-radius:14px;background:#fff;padding:9px 10px 10px}
+.hb-game .r{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#102F28;line-height:1.35}
+.hb-game strong{color:#626F6A;font-weight:700}
+.hb-game strong.w{color:#1F7157}
+.hb-game .m{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap}
+.hb-game .badge{background:#E6EFEC;color:#1F7157;font-weight:800;font-size:11px;padding:2px 6px;border-radius:6px}
+.hb-game .meta{font-size:11px;color:#505F59;flex:1}
+.hb-del{border:0;background:none;color:#8A9690;font:600 11px Manrope,Inter,sans-serif;cursor:pointer;padding:2px 0}
+.hb-del.on{color:#fff;background:#C0392B;border-radius:6px;padding:4px 8px}
+.hb-foot{margin:4px 0 0;font-size:13px;color:#505F59}
+.hb-old{font-size:13px;font-weight:700;color:#1F7157}
 </style>
 </head>
 <body>
@@ -209,7 +274,7 @@ const S = {
 };
 function toast(msg){ S.toast = msg; clearTimeout(S.toastT); S.toastT = setTimeout(() => { S.toast = ""; render(); }, 2600); render(); }
 async function refresh(){
-  try { S.data = await DB.loadAll(); S.err = ""; }
+  try { S.data = await DB.loadAll(); S.err = ""; S.loadedAt = Date.now(); }
   catch(e){ S.err = "Não consegui falar com o servidor. Confira a internet e tente de novo."; console.error(e); }
   if (S.data && !S.data.turmas.find(t => t.id === S.turma) && S.data.turmas[0]) S.turma = S.data.turmas[0].id;
   render();
@@ -547,43 +612,88 @@ function vDia(t){
   return vSorteio(t, date, L) + (c ? `<button class="btn ghost small" data-act="manual">${S.f.manual? 'Fechar jogo fora do sorteio' : '+ Lançar jogo fora do sorteio'}</button>` : '') + manual;
 }
 
+/* ---------- Campeonato no padrão do app HBJr ---------- */
+const HB_COLORS = {"Hercílio":"#00AEA6","Norton":"#C26EC0","Geraldo":"#7988ED","Felipe":"#60A746","Hemerson":"#D77428","Alexandre":"#D9668E"};
+const HB_EXTRA = ["#00AEA6","#C26EC0","#7988ED","#60A746","#D77428","#D9668E","#3E8ED0","#B59A2B","#8C6BB1","#4F9D8F"];
+function hbColor(c, nome){ if (HB_COLORS[nome]) return HB_COLORS[nome]; const i = Math.max(0, (c.jogadores||[]).indexOf(nome)); return HB_EXTRA[(i + 6) % HB_EXTRA.length]; }
+function mix(hex, k){ const n = parseInt(hex.slice(1),16); const r = n>>16&255, g = n>>8&255, b = n&255; const f = v => Math.round(v + (255-v)*k).toString(16).padStart(2,"0"); return "#"+f(r)+f(g)+f(b); }
+function mixHex(a, b, t){ const A = parseInt(a.slice(1),16), B = parseInt(b.slice(1),16); const c = (s) => Math.round(((A>>s)&255)*(1-t) + ((B>>s)&255)*t); return "#"+[16,8,0].map(s => c(s).toString(16).padStart(2,"0")).join(""); }
+const abbr = n => n.normalize("NFD").replace(/[̀-ͯ]/g,"").slice(0,3).toUpperCase();
+const iso = d => String(d||"").slice(0,10);
+const dmy = d => { const x = iso(d).split("-"); return x.length===3 ? x[2]+"/"+x[1]+"/"+x[0] : d; };
+const MEDAL = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 2h9.6l-3 6h-3.6z"/><path d="M9 8.5 7.2 2M15 8.5 16.8 2"/><circle cx="12" cy="15" r="6"/><path d="m12 12.2.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z"/></svg>';
+function niceMax(v, steps){ if (v <= 0) return steps; const raw = v/steps; const p = Math.pow(10, Math.floor(Math.log10(raw))); const m = [1,2,2.5,4,5,8,10].find(x => x*p >= raw) || 10; return m*p*steps; }
+function hbChart(c, r, dates){
+  if (!dates.length || !r.length) return "";
+  const per = dates.map(d => ranking(c, d));
+  const val = (di, nome) => { const x = per[di].find(z => z.nome === nome); return x ? x.total : 0; };
+  const maxDay = Math.max(1, ...r.flatMap(x => dates.map((_,di) => val(di, x.nome))));
+  const maxTot = Math.max(1, ...r.map(x => x.total));
+  const L = niceMax(maxDay, 4), R = niceMax(maxTot, 4);
+  const W = 470, H = 270, x0 = 52, x1 = W-40, y0 = 14, y1 = H-36, ph = y1-y0;
+  const gw = (x1-x0)/r.length, D = dates.length, bw = Math.min(16, (gw*0.72)/D), gap = Math.min(4, bw*0.25);
+  let g = "";
+  for (let i = 0; i <= 4; i++) { const y = y1 - ph*i/4;
+    g += `<line x1="${x0}" x2="${x1}" y1="${y}" y2="${y}" stroke="#E4E9E6"/><text x="${x0-8}" y="${y+4}" text-anchor="end" class="ax">${+(L*i/4).toFixed(1)}</text><text x="${x1+8}" y="${y+4}" class="ax">${+(R*i/4).toFixed(1)}</text>`; }
+  g += `<line x1="${x0}" x2="${x0}" y1="${y0}" y2="${y1}" stroke="#7A8882"/><line x1="${x1}" x2="${x1}" y1="${y0}" y2="${y1}" stroke="#7A8882"/><line x1="${x0}" x2="${x1}" y1="${y1}" y2="${y1}" stroke="#7A8882"/>`;
+  g += `<text transform="translate(14 ${(y0+y1)/2}) rotate(-90)" text-anchor="middle" class="ax">Pontos conquistados</text>`;
+  const pts = [];
+  r.forEach((x, i) => { const cx = x0 + gw*i + gw/2; const col = hbColor(c, x.nome); const tw = D*bw + (D-1)*gap; let bx = cx - tw/2;
+    dates.forEach((_, di) => { const v = val(di, x.nome); const h = ph*v/L; const k = D>1 ? 0.55*(D-1-di)/(D-1) : 0;
+      g += `<rect x="${bx.toFixed(1)}" y="${(y1-h).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${mix(col,k)}"><title>${esc(x.nome)} · ${ddmm(dates[di])}: ${v}</title></rect>`; bx += bw + gap; });
+    g += `<line x1="${cx}" x2="${cx}" y1="${y1}" y2="${y1+5}" stroke="#7A8882"/><text x="${cx}" y="${y1+20}" text-anchor="middle" class="ax">${abbr(x.nome)}</text>`;
+    pts.push([cx, y1 - ph*x.total/R]); });
+  g += `<polyline points="${pts.map(p => p.map(v => v.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="#53A640" stroke-width="3.5" stroke-linejoin="round"/>`;
+  const gray = di => D>1 ? mixHex("#B0B7B4", "#505F59", di/(D-1)) : "#505F59";
+  return `<section class="hb-sec"><h3 class="hb-h3">Evolução / Pontos dos jogadores por dia — ${esc(c.nome)}</h3>
+    <svg viewBox="0 0 ${W} ${H}" class="hb-chart" role="img" aria-label="Pontos por dia de cada jogador e total acumulado">${g}</svg>
+    <div class="hb-scroll"><table class="hb-leg"><thead><tr><th></th>${r.map(x => `<th><i class="dot lg" style="background:${hbColor(c,x.nome)}"></i><br>${esc(x.nome)}</th>`).join("")}</tr></thead><tbody>
+    ${dates.map((d,di) => `<tr><td class="l"><i class="sq" style="background:${gray(di)}"></i>${ddmm(d)}</td>${r.map(x => `<td>${val(di,x.nome)}</td>`).join("")}</tr>`).join("")}
+    <tr class="tot"><td class="l"><i class="ln"></i>TOTAL</td>${r.map(x => `<td>${x.total}</td>`).join("")}</tr></tbody></table></div></section>`;
+}
 function vRank(){
   const t = turmaAtual();
   if (!S.champ || !S.data.campeonatos.find(c => c.id === S.champ)) { const c = currentChamp(t.id); S.champ = c ? c.id : null; }
   const c = S.data.campeonatos.find(x => x.id === S.champ);
   const all = champsOf(null);
   if (!c) return `<section class="card col"><b>Nenhum campeonato ainda.</b><span class="muted">Crie o primeiro na aba Turma.</span><button class="btn" data-act="view" data-v="turma">Criar campeonato</button></section>`;
-  const games = gamesOf(c.id);
-  const dates = [...new Set(games.map(g => String(g.data).slice(0,10)))].sort();
+  const games = gamesOf(c.id).slice().sort((a,b) => (a.numero||0)-(b.numero||0) || iso(a.data).localeCompare(iso(b.data)));
+  const dates = [...new Set(games.map(g => iso(g.data)))].sort();
   if (S.day !== "mes" && !dates.includes(S.day)) S.day = "mes";
-  const head = `
-  <select class="f" data-act-change="pickChamp" aria-label="Campeonato">${all.map(x => `<option value="${esc(x.id)}" ${x.id===c.id?'selected':''}>${esc(x.nome)}${x.encerrado?' (encerrado)':''}</option>`).join("")}</select>
-  <section class="card dark col"><div class="kick">${esc((S.data.turmas.find(x => x.id===c.turma_id)||{}).nome||"")} · Guto</div><h2>${esc(c.nome)}</h2><span class="muted">${games.length} jogos · ${(c.jogadores||[]).length} no ranking${c.inicio? " · "+ddmm(c.inicio)+" a "+ddmm(c.fim||c.inicio):""}</span><span class="muted" style="font-size:13px">O placar é lançado na aba Jogo de hoje.</span><a href="${OLD_APP}" target="_blank" rel="noopener" style="color:#F4F1DE;font-size:13px;font-weight:700">Abrir no app antigo (HBJr) ↗</a></section>
-  <div class="seg">${[["ranking","Ranking"],["jogos","Jogos"]].map(([k,l]) => `<button class="${S.ctab===k?'on':''}" data-act="ctab" data-v="${k}">${l}</button>`).join("")}</div>`;
-  const dayChips = `<div class="chips"><button class="chip ${S.day==='mes'?'on':''}" data-act="day" data-v="mes">Campeonato inteiro</button>${dates.map(d => `<button class="chip ${S.day===d?'on':''}" data-act="day" data-v="${d}">${ddmm(d)}</button>`).join("")}</div>`;
-  if (S.ctab === "jogos") {
-    const list = games.filter(g => S.day === "mes" || String(g.data).slice(0,10) === S.day).slice().reverse();
-    return head + dayChips + `<div class="col">${list.map(g => { const aw = g.placar_a > g.placar_b; const sub = [g.a1,g.a2,g.b1,g.b2].filter(n => !(c.jogadores||[]).includes(n));
-      return `<div class="card game"><div class="ln ${aw?'w':'lose'}"><span>${esc(g.a1)} / ${esc(g.a2)}</span><span>${g.placar_a}</span></div><div class="ln ${!aw?'w':'lose'}"><span>${esc(g.b1)} / ${esc(g.b2)}</span><span>${g.placar_b}</span></div>
-      <div class="row" style="justify-content:space-between"><span class="muted">Jogo ${g.numero||""} · ${ddmm(g.data)}${sub.length? ' · fora do ranking: '+sub.map(esc).join(", "):""}</span>
-      ${S.confirm === "g:"+g.id ? `<button class="btn danger small" data-act="delGame" data-id="${esc(g.id)}">Confirmar exclusão</button>` : `<button class="btn ghost small" data-act="ask" data-id="g:${esc(g.id)}">Excluir</button>`}</div></div>`; }).join("") || '<span class="muted">Sem jogos neste dia.</span>'}</div>`;
+  const tn = (S.data.turmas.find(x => x.id===c.turma_id)||{}).nome || "";
+  const n = (c.jogadores||[]).length;
+  const tab = S.ctab === "jogos" ? "jogos" : "ranking"; S.ctab = tab;
+  const head = `<div class="hb">
+  <label class="hb-lab" for="hbc">Campeonato</label>
+  <select class="hb-sel" id="hbc" data-act-change="pickChamp">${all.map(x => `<option value="${esc(x.id)}" ${x.id===c.id?'selected':''}>${esc(x.nome)} · Guto${x.encerrado?' (encerrado)':''}</option>`).join("")}</select>
+  <section class="hb-hero"><div class="hb-kick">${esc(tn)} · Guto</div><h2>${esc(c.nome)}</h2><p>${n*(n-1)/2} duplas · ${games.length} jogos${c.inicio? " · "+iso(c.inicio)+" a "+iso(c.fim||c.inicio):""}</p></section>
+  <div class="hb-tabs"><button class="${tab==='ranking'?'on':''}" data-act="ctab" data-v="ranking">Ranking</button><button class="${tab==='jogos'?'on':''}" data-act="ctab" data-v="jogos">Jogos</button></div>
+  <div class="hb-tools"><button class="hb-upd" data-act="reload">Atualizar consulta</button>
+    <label class="hb-day"><span class="hb-lab">Dia</span><select class="hb-sel" data-act-change="pickDay"><option value="mes">${tab==='jogos'?'Todos os dias':'Campeonato inteiro'}</option>${dates.map(d => `<option value="${d}" ${S.day===d?'selected':''}>${dmy(d)}</option>`).join("")}</select></label></div>`;
+  const foot = `<p class="hb-foot">Atualizado em ${new Date(S.loadedAt||Date.now()).toLocaleString("pt-BR")}.</p>
+  <a class="hb-old" href="${OLD_APP}" target="_blank" rel="noopener">Abrir no app antigo (HBJr) ↗</a></div>`;
+  if (tab === "jogos") {
+    const list = games.filter(g => S.day === "mes" || iso(g.data) === S.day);
+    return head + `<div class="hb-games">${list.map(g => { const aw = g.placar_a > g.placar_b; const sub = [g.a1,g.a2,g.b1,g.b2].filter(x => !(c.jogadores||[]).includes(x));
+      return `<article class="hb-game"><div class="r"><span>${esc(g.a1)} / ${esc(g.a2)}</span><strong class="${aw?'w':''}">${g.placar_a}</strong></div><div class="r"><span>${esc(g.b1)} / ${esc(g.b2)}</span><strong class="${!aw?'w':''}">${g.placar_b}</strong></div>
+      <div class="m"><span class="badge">Jogo ${g.numero||""}</span><span class="meta">Finalizado · ${iso(g.data)}${sub.length? ' · fora do ranking: '+sub.map(esc).join(", "):""}</span>
+      ${S.confirm === "g:"+g.id ? `<button class="hb-del on" data-act="delGame" data-id="${esc(g.id)}">Confirmar exclusão</button>` : `<button class="hb-del" data-act="ask" data-id="g:${esc(g.id)}">Excluir</button>`}</div></article>`; }).join("") || '<p class="hb-foot">Sem jogos neste dia.</p>'}</div>` + foot;
   }
-  if (S.ctab !== "jogos") S.ctab = "ranking";
   const r = ranking(c, S.day);
-  const pod = [1,0,2].filter(i => r[i]).map(i => { const h = i===0?100:(i===1?80:68); const col = ["#E76F51","#14213D","#0B6E6D"][i]; return `<div class="pod"><b>${esc(r[i].nome)}</b><div style="height:${h}px;background:${col}"><span style="font-size:12px;font-weight:700">${i+1}º</span><span class="n">${r[i].total}</span><span style="font-size:11px">pts</span></div></div>`; }).join("");
+  const podium = [1,0,2].filter(i => r[i]).map(i => `<div class="pc p${i+1}"><span class="hav">${esc(r[i].nome[0])}</span><b>${esc(r[i].nome)}</b><div class="blk" style="background:${hbColor(c,r[i].nome)}">${MEDAL}<span>${r[i].total} pts</span></div></div>`).join("");
   const label = i => i===0?"CAMPEÃO":(i===1?"Segundo":(i===2?"Terceiro":""));
-  const evo = dates.map(d => ({d, r: ranking(c, d)}));
-  return head + dayChips + `
-  <div class="podium">${pod}</div>
-  <div class="card" style="padding:4px 8px"><table class="tbl"><thead><tr><th>#</th><th>Jogador</th><th>Pts</th><th>J</th><th>V</th><th>D</th><th>Saldo</th></tr></thead><tbody>
-  ${r.map((x,i) => `<tr class="${i===0?'top1':''} ${x.nome===S.me?'meRow':''}"><td>${i+1}º</td><td><b>${esc(x.nome)}</b></td><td><b>${x.total}</b></td><td>${x.j}</td><td>${x.v}</td><td>${x.d}</td><td>${x.saldo>0?'+':''}${x.saldo}</td></tr>`).join("")}
+  const pct = x => x.aprov==null ? "—" : (x.aprov*100).toFixed(2).replace(".",",")+"%";
+  return head + `
+  <div class="hb-podium">${podium}</div>
+  <div class="hb-card"><table class="hb-t"><thead><tr><th class="c">Pos.</th><th class="l">Jogador</th><th>Pts</th><th>J</th><th>V</th><th>D</th><th>Saldo</th></tr></thead><tbody>
+  ${r.map((x,i) => `<tr class="${i===0?'first':''}"><td class="c">${i+1}º</td><td class="l"><i class="dot" style="background:${hbColor(c,x.nome)}"></i>${esc(x.nome)}</td><td class="pts">${x.total}</td><td>${x.j}</td><td>${x.v}</td><td>${x.d}</td><td>${x.saldo>0?'+':''}${x.saldo}</td></tr>`).join("")}
   </tbody></table></div>
-  <div class="card col"><h3>Tabela detalhada · ${S.day==='mes'?'todas as datas':ddmm(S.day)}</h3><div class="scroll"><table class="tbl"><thead><tr><th>Class.</th><th>Jogador</th><th>Pontos</th><th>Vitórias</th><th>TOTAL</th><th>Partidas</th><th>Pneu</th><th>GP</th><th>GC</th><th>Saldo</th><th>Máx.</th><th>Aproveit.</th><th>Classificação</th></tr></thead><tbody>
-  ${r.map((x,i) => `<tr class="${i===0?'top1':''}"><td>${i+1}</td><td><b>${esc(x.nome)}</b></td><td>${x.pts}</td><td>${x.v}</td><td><b>${x.total}</b></td><td>${x.j}</td><td>${x.pneu}</td><td>${x.gp}</td><td>${x.gc}</td><td>${x.saldo}</td><td>${x.max}</td><td>${x.aprov==null?'-':(x.aprov*100).toFixed(2).replace('.',',')+'%'}</td><td>${x.j?label(i):''}</td></tr>`).join("")}
-  </tbody></table></div><span class="muted">GP: games pró · GC: games contra · TOTAL = pontos (games) + vitórias · Máx. = games do vencedor + 1, por jogo · Aproveit. = TOTAL ÷ Máx. · Pneu: derrota sem vencer nenhum game.</span></div>
-  ${evo.length>1? `<div class="card col"><h3>Evolução: pontos por dia</h3><div class="scroll"><table class="tbl"><thead><tr><th>Dia</th><th></th>${r.map(x => `<th>${esc(x.nome)}</th>`).join("")}</tr></thead><tbody>
-  ${evo.map(e => `<tr><td>${ddmm(e.d)}</td><td></td>${r.map(x => { const y = e.r.find(z => z.nome === x.nome); return `<td>${y? y.total:0}</td>`; }).join("")}</tr>`).join("")}
-  <tr><td><b>TOTAL</b></td><td></td>${r.map(x => `<td><b>${x.total}</b></td>`).join("")}</tr></tbody></table></div></div>`:""}`;
+  <section class="hb-sec"><h3 class="hb-h3">Tabela detalhada — <span>Data: ${S.day==='mes'?'Todas':dmy(S.day)}</span></h3>
+  <div class="hb-scroll"><table class="hb-d"><thead><tr><th class="l">Jogador</th><th>Pontos</th><th>Vitórias</th><th class="g">TOTAL</th><th>Partidas</th><th>Pneu</th><th>GP*</th><th>GC*</th><th>Saldo<br>Games</th><th>Max<br>Pontos</th><th>Aproveit.</th><th>Classificação</th><th>Class.</th></tr></thead><tbody>
+  ${r.map((x,i) => `<tr class="${i===0?'k1':(i<3?'k2':'')}"><td class="l"><i class="dot" style="background:${hbColor(c,x.nome)}"></i><b>${esc(x.nome)}</b></td><td>${x.pts}</td><td>${x.v}</td><td><b>${x.total}</b></td><td>${x.j}</td><td>${x.pneu}</td><td>${x.gp}</td><td>${x.gc}</td><td>${x.saldo}</td><td>${x.max}</td><td>${pct(x)}</td><td>${x.j?label(i):''}</td><td>${i+1}</td></tr>`).join("")}
+  </tbody></table></div>
+  <p class="hb-note">* GP: total de games prós · GC: total de games contra · TOTAL = pontos (games) + vitórias · Aproveit. = TOTAL ÷ Max Pontos · Pneu: partidas perdidas sem vencer nenhum game (ex.: 6 x 0).</p></section>
+  ${hbChart(c, ranking(c, "mes"), dates)}` + foot;
 }
 
 function vLancar(c){
@@ -702,6 +812,7 @@ function render(){
   <nav class="nav"><div class="in">${[["mural","Resenha","mural"],["jogo","Jogo de hoje","jogo"],["rank","Campeonato","rank"],["turma","Turma","turma"]].map(([k,l,i]) => `<button class="${S.view===k?'on':''} ${k==='mural'?'hot':''}" data-act="view" data-v="${k}" ${S.view===k?'aria-current="page"':''}><span class="ico">${k==='mural'? ICON_RESENHA : ICON[i]}</span>${l}</button>`).join("")}</div></nav>
   ${(!S.me || S.sheet==="who")? vWho():""}
   ${S.toast? `<div class="toast" role="status">${esc(S.toast)}</div>`:""}`;
+  document.documentElement.classList.toggle("hbpage", S.view === "rank");
   if (focusSel) { const el = root.querySelector(`[data-bind="${focusSel}"]`); if (el) { el.focus(); try { if (caret != null) el.setSelectionRange(caret, caret); } catch(e){} } }
   window.scrollTo(0, scrollY);
 }
@@ -712,6 +823,7 @@ document.addEventListener("input", e => { const b = e.target.dataset && e.target
 document.addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.actChange === "pickChamp") { S.champ = el.value; S.day = "mes"; render(); return; }
+  if (el.dataset.actChange === "pickDay") { S.day = el.value; render(); return; }
   if (el.dataset.bind) { setBind(el.dataset.bind, el.type === "checkbox" ? el.checked : el.value); if (el.dataset.rerender) render(); }
 });
 // campo de foto fixo, fora da área que a tela redesenha (a atualização automática não o apaga)
@@ -757,6 +869,7 @@ document.addEventListener("click", e => {
     case "goLaunch": S.view = "jogo"; window.scrollTo(0,0); render(); break;
     case "ctab": S.ctab = d.v; render(); break;
     case "day": S.day = d.v; render(); break;
+    case "reload": refresh().then(() => toast("Consulta atualizada")); break;
     case "ask": S.confirm = d.id; render(); break;
     case "pres": setPresence(t, nextDate(t), d.n, d.s); break;
     case "delPres": act(() => DB.remove("presencas", d.id)); break;
