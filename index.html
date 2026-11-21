@@ -89,7 +89,11 @@ label.l{font-size:13px;font-weight:700}
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:#fff;border-top:1px solid var(--line);padding:6px 6px calc(10px + env(safe-area-inset-bottom))}
 .nav .in{max-width:560px;margin:0 auto;display:flex;justify-content:space-around}
 .nav button{flex:1;min-height:52px;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer}
-.nav button.on{color:var(--navy)}
+.nav button{position:relative}
+.nav .ico{display:flex;align-items:center;justify-content:center;width:56px;height:32px;border-radius:16px;transition:background .15s}
+.nav button.on{color:var(--navy);font-weight:800}
+.nav button.on .ico{background:#F3E3BC}
+.nav button.on::before{content:"";position:absolute;top:-7px;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;background:var(--navy)}
 .nav svg{width:22px;height:22px}
 .post{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-bottom:1px solid #EFE8DB}
 .post:last-child{border-bottom:0}
@@ -106,8 +110,10 @@ label.l{font-size:13px;font-weight:700}
 .fb{display:flex;flex-direction:column;gap:6px;padding:10px 12px 12px}
 .ic{background:none;border:0;padding:4px;margin:-4px;color:var(--ink);cursor:pointer;min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center}
 .lnk{background:none;border:0;padding:0;color:var(--muted);font-size:13px;cursor:pointer;text-align:left}
-.nav button.hot{color:#C2410C;font-weight:800}
-.nav button.hot svg{width:30px;height:30px;filter:drop-shadow(0 2px 4px rgba(231,111,81,.35))}
+.nav button.hot svg{width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(231,111,81,.35))}
+.nav button.hot.on{color:#C2410C}
+.nav button.hot.on .ico{background:#FBE0D6}
+.nav button.hot.on::before{background:#E76F51}
 </style>
 </head>
 <body>
@@ -163,7 +169,7 @@ const DB = {
     const out = {};
     for (const t of TABLES) {
       let q = sb.from(t).select("*");
-      if (t === "mural") q = q.order("created_at", {ascending:false}).limit(100);
+      if (t === "mural") q = q.order("created_at", {ascending:false}).limit(300);
       if (t === "presencas") { const d = new Date(); d.setDate(d.getDate()-2); q = q.gte("data", ymd(d)); }
       const { data, error } = await q;
       if (error) throw error;
@@ -196,7 +202,7 @@ const S = {
   data: null, err: "",
   me: store.get("panelinha-me") || "",
   turma: store.get("panelinha-turma") || "quinta",
-  view: "inicio",
+  view: "mural",
   champ: null, ctab: "ranking", day: "mes",
   f: { a1:"", a2:"", b1:"", b2:"", pa:null, pb:null, data:today(), outro:{}, guest:"", post:"", newMember:"", addRank:true, champNome:"", champIni:"", champFim:"", tNome:"", tDia:"4", tIni:"20:00", tFim:"22:00", tVagas:"4", meOutro:"" },
   confirm: null, sheet: null, toast: "", toastT: null
@@ -462,7 +468,7 @@ function vJogo(){
   const subsPres = L.pres.filter(p => p.tipo !== "membro");
   const drawn = !!sorteioOf(t, date) && !S.f.redraw;
   return `
-  <div><div class="kick">${date===today()?"Hoje":DIAS[t.dia_semana]} · ${ddmm(date)}</div><h2>Jogo de ${esc(t.nome.toLowerCase())}</h2><div class="muted">${hm(t.hora_inicio)} às ${hm(t.hora_fim)} · ${esc(t.local||"")} · ${t.vagas} vagas</div></div>
+  <div><div class="kick">${esc(t.nome)} · ${DIAS[t.dia_semana]} ${ddmm(date)}</div><h2>${date===today()?"Jogo de hoje":"Próximo jogo"}</h2><div class="muted">${hm(t.hora_inicio)} às ${hm(t.hora_fim)} · ${esc(t.local||"")} · ${t.vagas} vagas</div></div>
   ${drawn? vDia(t) : ''}
   <section class="card col">
     <div class="row" style="justify-content:space-between"><h3>Presença</h3><b>${L.inGame.length} de ${t.vagas}</b></div>
@@ -492,7 +498,7 @@ function vSorteio(t, date, L){
     const per = P.length ? sor.jogos.length*4/P.length : 0;
     const seen = {};
     return `<section class="card col" id="sorteio">
-      <div class="row" style="justify-content:space-between"><div><div class="kick">${date===today()?"Hoje":DIAS[t.dia_semana]+" "+ddmm(date)} · ${esc(t.nome)}</div><b style="font-size:16px">Jogos sorteados</b><div class="muted">${sor.jogos.length} jogos · ${per} para cada · ${done} de ${sor.jogos.length} com placar</div></div></div>
+      <div class="row" style="justify-content:space-between"><div><div class="kick">${date===today()?"Hoje":DIAS[t.dia_semana]+" "+ddmm(date)}</div><b style="font-size:16px">Jogos sorteados</b><div class="muted">${sor.jogos.length} jogos · ${per} para cada · ${done} de ${sor.jogos.length} com placar</div></div></div>
       ${sor.local? '<div class="demo" style="margin:0">Este sorteio ficou só neste celular. Para a turma toda ver, falta um ajuste no banco (avise o Norton).</div>':''}
       <div class="col" style="gap:8px">${sor.jogos.map((j,i) => {
         const g = st[i]; const rest = P.filter(p => !j.a.includes(p) && !j.b.includes(p));
@@ -522,7 +528,7 @@ function vSorteio(t, date, L){
   const def = defaultRounds(n, t);
   const rounds = Math.max(1, Number(S.f.drawRounds) || def || 1);
   return `<section class="card col" id="sorteio">
-    <div><div class="kick">${date===today()?"Hoje":DIAS[t.dia_semana]+" "+ddmm(date)} · ${esc(t.nome)}</div><b style="font-size:16px">Sortear os jogos</b><div class="muted">Faça um pouco antes da partida. Todo mundo joga o mesmo número de jogos.</div></div>
+    <div><div class="kick">${date===today()?"Hoje":DIAS[t.dia_semana]+" "+ddmm(date)}</div><b style="font-size:16px">Sortear os jogos</b><div class="muted">Faça um pouco antes da partida. Todo mundo joga o mesmo número de jogos.</div></div>
     <label class="l">Quem joga hoje (${n})</label>
     <div class="chips" style="flex-wrap:wrap">${cand.map(nm => `<button class="chip ${pick.includes(nm)?'on':''}" data-act="drawToggle" data-n="${esc(nm)}">${pick.includes(nm)?'✓ ':''}${esc(nm)}</button>`).join("")}</div>
     ${n < 4 ? '<span class="muted">Marque pelo menos 4 jogadores.</span>' : `
@@ -552,8 +558,8 @@ function vRank(){
   if (S.day !== "mes" && !dates.includes(S.day)) S.day = "mes";
   const head = `
   <select class="f" data-act-change="pickChamp" aria-label="Campeonato">${all.map(x => `<option value="${esc(x.id)}" ${x.id===c.id?'selected':''}>${esc(x.nome)}${x.encerrado?' (encerrado)':''}</option>`).join("")}</select>
-  <section class="card dark col"><div class="kick">${esc((S.data.turmas.find(x => x.id===c.turma_id)||{}).nome||"")} · Guto</div><h2>${esc(c.nome)}</h2><span class="muted">${games.length} jogos · ${(c.jogadores||[]).length} no ranking${c.inicio? " · "+ddmm(c.inicio)+" a "+ddmm(c.fim||c.inicio):""}</span></section>
-  <div class="seg">${[["ranking","Ranking"],["jogos","Jogos"],["lancar","Lançar placar"]].map(([k,l]) => `<button class="${S.ctab===k?'on':''}" data-act="ctab" data-v="${k}">${l}</button>`).join("")}</div>`;
+  <section class="card dark col"><div class="kick">${esc((S.data.turmas.find(x => x.id===c.turma_id)||{}).nome||"")} · Guto</div><h2>${esc(c.nome)}</h2><span class="muted">${games.length} jogos · ${(c.jogadores||[]).length} no ranking${c.inicio? " · "+ddmm(c.inicio)+" a "+ddmm(c.fim||c.inicio):""}</span><span class="muted" style="font-size:13px">O placar é lançado na aba Jogo de hoje.</span><a href="${OLD_APP}" target="_blank" rel="noopener" style="color:#F4F1DE;font-size:13px;font-weight:700">Abrir no app antigo (HBJr) ↗</a></section>
+  <div class="seg">${[["ranking","Ranking"],["jogos","Jogos"]].map(([k,l]) => `<button class="${S.ctab===k?'on':''}" data-act="ctab" data-v="${k}">${l}</button>`).join("")}</div>`;
   const dayChips = `<div class="chips"><button class="chip ${S.day==='mes'?'on':''}" data-act="day" data-v="mes">Campeonato inteiro</button>${dates.map(d => `<button class="chip ${S.day===d?'on':''}" data-act="day" data-v="${d}">${ddmm(d)}</button>`).join("")}</div>`;
   if (S.ctab === "jogos") {
     const list = games.filter(g => S.day === "mes" || String(g.data).slice(0,10) === S.day).slice().reverse();
@@ -562,12 +568,7 @@ function vRank(){
       <div class="row" style="justify-content:space-between"><span class="muted">Jogo ${g.numero||""} · ${ddmm(g.data)}${sub.length? ' · fora do ranking: '+sub.map(esc).join(", "):""}</span>
       ${S.confirm === "g:"+g.id ? `<button class="btn danger small" data-act="delGame" data-id="${esc(g.id)}">Confirmar exclusão</button>` : `<button class="btn ghost small" data-act="ask" data-id="g:${esc(g.id)}">Excluir</button>`}</div></div>`; }).join("") || '<span class="muted">Sem jogos neste dia.</span>'}</div>`;
   }
-  if (S.ctab === "lancar") {
-    const tc = S.data.turmas.find(x => x.id === c.turma_id);
-    const cur = tc && currentChamp(tc.id);
-    if (tc && cur && cur.id === c.id && !c.encerrado) return head + vDia(tc);
-    return head + vLancar(c);
-  }
+  if (S.ctab !== "jogos") S.ctab = "ranking";
   const r = ranking(c, S.day);
   const pod = [1,0,2].filter(i => r[i]).map(i => { const h = i===0?100:(i===1?80:68); const col = ["#E76F51","#14213D","#0B6E6D"][i]; return `<div class="pod"><b>${esc(r[i].nome)}</b><div style="height:${h}px;background:${col}"><span style="font-size:12px;font-weight:700">${i+1}º</span><span class="n">${r[i].total}</span><span style="font-size:11px">pts</span></div></div>`; }).join("");
   const label = i => i===0?"CAMPEÃO":(i===1?"Segundo":(i===2?"Terceiro":""));
@@ -697,8 +698,8 @@ function render(){
   <nav class="turmas" aria-label="Turmas">${S.data.turmas.map(x => `<button class="tpill ${x.id===t.id?'on':''}" data-act="turma" data-id="${esc(x.id)}">${esc(x.nome)}</button>`).join("")}<button class="tpill" data-act="view" data-v="turma" aria-label="Nova turma">+</button></nav></header>
   ${ONLINE? "": '<div class="demo">Modo demonstração: os dados ficam só neste aparelho. Com o Supabase ligado, tudo passa a ser da turma.</div>'}
   ${S.err? `<div class="demo">${esc(S.err)}</div>`:""}
-  <main>${(views[S.view]||vInicio)()}</main>
-  <nav class="nav"><div class="in">${[["inicio","Início","home"],["jogo","Jogo","jogo"],["rank","Campeonato","rank"],["mural","Resenha","mural"],["turma","Turma","turma"]].map(([k,l,i]) => `<button class="${S.view===k?'on':''} ${k==='mural'?'hot':''}" data-act="view" data-v="${k}">${k==='mural'? ICON_RESENHA : ICON[i]}${l}</button>`).join("")}</div></nav>
+  <main>${(views[S.view]||vMural)()}</main>
+  <nav class="nav"><div class="in">${[["mural","Resenha","mural"],["jogo","Jogo de hoje","jogo"],["rank","Campeonato","rank"],["turma","Turma","turma"]].map(([k,l,i]) => `<button class="${S.view===k?'on':''} ${k==='mural'?'hot':''}" data-act="view" data-v="${k}" ${S.view===k?'aria-current="page"':''}><span class="ico">${k==='mural'? ICON_RESENHA : ICON[i]}</span>${l}</button>`).join("")}</div></nav>
   ${(!S.me || S.sheet==="who")? vWho():""}
   ${S.toast? `<div class="toast" role="status">${esc(S.toast)}</div>`:""}`;
   if (focusSel) { const el = root.querySelector(`[data-bind="${focusSel}"]`); if (el) { el.focus(); try { if (caret != null) el.setSelectionRange(caret, caret); } catch(e){} } }
@@ -753,7 +754,7 @@ document.addEventListener("click", e => {
     case "setMe": S.me = d.n; store.set("panelinha-me", d.n); S.sheet = null; render(); break;
     case "setMeOutro": { const n = S.f.meOutro.trim(); if (!n) return; S.me = n; store.set("panelinha-me", n); S.sheet = null; S.f.meOutro = ""; render(); break; }
     case "goRank": S.view = "rank"; S.champ = d.id; S.ctab = "ranking"; S.day = "mes"; window.scrollTo(0,0); render(); break;
-    case "goLaunch": S.view = "rank"; S.champ = d.id; S.ctab = "lancar"; window.scrollTo(0,0); render(); break;
+    case "goLaunch": S.view = "jogo"; window.scrollTo(0,0); render(); break;
     case "ctab": S.ctab = d.v; render(); break;
     case "day": S.day = d.v; render(); break;
     case "ask": S.confirm = d.id; render(); break;
@@ -788,7 +789,7 @@ document.addEventListener("click", e => {
     case "dSave": saveDrawGame(Number(d.i)); break;
     case "manual": S.f.manual = !S.f.manual; render(); break;
     case "drawLaunch": { const date = nextDate(t); const sor = sorteioOf(t, date); const j = sor && sor.jogos[Number(d.i)]; const c = currentChamp(t.id); if (!j || !c) return;
-      Object.assign(S.f, {a1:j.a[0], a2:j.a[1], b1:j.b[0], b2:j.b[1], pa:null, pb:null, data:date, fromDraw:true}); S.view = "rank"; S.champ = c.id; S.ctab = "lancar"; window.scrollTo(0,0); render(); break; }
+      Object.assign(S.f, {a1:j.a[0], a2:j.a[1], b1:j.b[0], b2:j.b[1], pa:null, pb:null, data:date, fromDraw:true}); S.view = "jogo"; S.f.manual = true; window.scrollTo(0,0); render(); break; }
     case "newChamp": newChamp(); break;
     case "newTurma": newTurma(); break;
   }
@@ -814,7 +815,7 @@ function saveGame(){
   S.f.pa = null; S.f.pb = null;
   const back = S.f.fromDraw;
   if (back) { S.f.a1 = S.f.a2 = S.f.b1 = S.f.b2 = ""; S.f.fromDraw = false; }
-  act(async () => { await DB.insert("partidas", row); if (back) { S.view = "jogo"; } }, "Placar salvo. Ranking atualizado.");
+  act(async () => { await DB.insert("partidas", row); S.view = "jogo"; }, "Placar salvo. Ranking atualizado.");
 }
 function drawTurma(){
   // na aba Campeonato, a turma é a do campeonato aberto; nas outras, a turma selecionada
