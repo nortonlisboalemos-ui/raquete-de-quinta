@@ -3,30 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#14213D">
+<meta name="theme-color" content="#1B4A3D">
 <title>Raquete de Quinta · Panelinha</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--navy:#14213D;--sand:#E9C46A;--coral:#E76F51;--off:#F4F1DE;--bg:#F7F3EC;--line:#E4DCCD;--ink:#1B1F23;--muted:#5B6168;--teal:#0B6E6D;--green:#2F6B45;--rust:#9A3412}
+:root{--navy:#23614F;--sand:#CFE6DA;--g-top:#1B4A3D;--g-mid:#2A6B59;--g-hero:#33806B;--g-tab:#3F8F78;--g-soft:#E3F0E9;--coral:#E76F51;--off:#F2F8F4;--bg:#F1F6F3;--line:#D9E6DF;--ink:#1B1F23;--muted:#5B6168;--teal:#0B6E6D;--green:#2F6B45;--rust:#9A3412}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-text-size-adjust:100%}
 button,input,select,textarea{font:inherit;color:inherit}
 a{color:var(--teal)}
 .wrap{max-width:560px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-.top{position:sticky;top:0;z-index:5;background:var(--navy);color:var(--off);padding:10px 14px 0}
+.top{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--g-top) 0%,var(--g-mid) 100%);color:var(--off);padding:10px 14px 0}
 .brand{display:flex;align-items:center;gap:10px}
 .brand h1{margin:0;font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:800;font-size:20px;flex:1;line-height:1.1}
 .brand small{display:block;font-family:Inter;font-weight:600;font-size:11px;letter-spacing:.8px;color:var(--sand)}
 .me{min-height:40px;padding:0 12px;border-radius:20px;border:1px solid rgba(255,255,255,.3);background:transparent;color:var(--off);font-size:13px;font-weight:700;cursor:pointer}
 .turmas{display:flex;gap:6px;overflow-x:auto;padding:10px 0 10px}
 .tpill{flex:none;min-height:38px;padding:0 14px;border-radius:19px;border:1px solid rgba(255,255,255,.3);background:transparent;color:var(--off);font-weight:700;font-size:14px;cursor:pointer}
-.tpill.on{background:var(--sand);color:var(--navy);border-color:var(--sand)}
+.tpill.on{background:var(--sand);color:var(--g-top);border-color:var(--sand)}
 .demo{background:#FBE7DC;color:var(--rust);font-size:12px;font-weight:600;padding:8px 14px;text-align:center}
 main{flex:1;padding:14px 14px 96px;display:flex;flex-direction:column;gap:14px}
 .card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px}
 .dark{background:var(--navy);color:var(--off);border:0}
-.kick{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--rust)}
+.kick{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#2E7562}
 .dark .kick{color:var(--sand)}
 h2{margin:2px 0 0;font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:800;font-size:22px;line-height:1.1}
 h3{margin:0;font-size:13px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
@@ -43,33 +43,33 @@ h3{margin:0;font-size:13px;font-weight:800;letter-spacing:.6px;text-transform:up
 .btn.small{min-height:38px;padding:0 12px;font-size:13px;border-radius:10px}
 .btn.danger{background:#fff;border:1px solid #E7B9A8;color:var(--rust)}
 .btn:disabled{background:#E4DCCD;color:var(--muted);cursor:default}
-.seg{display:flex;gap:3px;background:#EDE5D6;border-radius:12px;padding:3px}
+.seg{display:flex;gap:3px;background:#E3EEE8;border-radius:12px;padding:3px}
 .seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer}
 .seg button.on{background:#fff;color:var(--navy)}
 .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
-.chip{flex:none;min-height:36px;padding:0 12px;border-radius:18px;border:1px solid #D8CEBC;background:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.chip{flex:none;min-height:36px;padding:0 12px;border-radius:18px;border:1px solid #C6D9CF;background:#fff;font-size:13px;font-weight:700;cursor:pointer}
 .chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
 .lead{display:flex;align-items:center;gap:8px;min-height:36px;padding:0 10px;border-radius:10px;background:rgba(255,255,255,.07);font-size:14px}
 .lead.first{background:rgba(233,196,106,.22)}
-.bar{height:8px;border-radius:4px;background:#EFE8DB;overflow:hidden}
+.bar{height:8px;border-radius:4px;background:#E3EEE8;overflow:hidden}
 .bar>i{display:block;height:100%;background:var(--coral)}
-.person{display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 0;border-bottom:1px solid #EFE8DB}
+.person{display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 0;border-bottom:1px solid #E3EEE8}
 .person:last-child{border-bottom:0}
 .av{width:34px;height:34px;border-radius:17px;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;background:var(--navy)}
 .pname{flex:1;min-width:0;font-weight:600}
-.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#F7F3EC;color:var(--muted);border:1px solid var(--line)}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#F1F6F3;color:var(--muted);border:1px solid var(--line)}
 .tag.ok{background:#E5F4E4;color:var(--green);border-color:#B9DDB6}
 .tag.no{background:#FBE7DC;color:var(--rust);border-color:#F0C3B0}
 .yn{display:flex;gap:4px}
-.yn button{min-height:38px;min-width:58px;padding:0 10px;border-radius:10px;border:1px solid #D8CEBC;background:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.yn button{min-height:38px;min-width:58px;padding:0 10px;border-radius:10px;border:1px solid #C6D9CF;background:#fff;font-size:13px;font-weight:700;cursor:pointer}
 .yn button.yes{background:var(--green);border-color:var(--green);color:#fff}
 .yn button.nob{background:var(--rust);border-color:var(--rust);color:#fff}
-input.f,select.f,textarea.f{width:100%;min-height:46px;border-radius:12px;border:1px solid #D8CEBC;background:#fff;padding:0 12px;font-size:16px}
+input.f,select.f,textarea.f{width:100%;min-height:46px;border-radius:12px;border:1px solid #C6D9CF;background:#fff;padding:0 12px;font-size:16px}
 textarea.f{padding:10px 12px;min-height:80px;resize:vertical}
 label.l{font-size:13px;font-weight:700}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}
-.tbl th{font-size:11px;text-transform:uppercase;color:var(--muted);text-align:right;padding:8px 6px;border-bottom:1px solid #EFE8DB;white-space:nowrap}
-.tbl td{padding:9px 6px;border-bottom:1px solid #EFE8DB;text-align:right;white-space:nowrap}
+.tbl th{font-size:11px;text-transform:uppercase;color:var(--muted);text-align:right;padding:8px 6px;border-bottom:1px solid #E3EEE8;white-space:nowrap}
+.tbl td{padding:9px 6px;border-bottom:1px solid #E3EEE8;text-align:right;white-space:nowrap}
 .tbl th:first-child,.tbl td:first-child,.tbl th:nth-child(2),.tbl td:nth-child(2){text-align:left}
 .tbl tr.top1 td{background:#FBF0D4}
 .tbl tr.meRow td{background:#EEF2F8}
@@ -84,7 +84,7 @@ label.l{font-size:13px;font-weight:700}
 .game .w{font-weight:800;color:var(--navy)}
 .game .lose{color:var(--muted)}
 .scorebtns{display:flex;gap:4px;flex-wrap:wrap}
-.scorebtns button{width:42px;height:42px;border-radius:10px;border:1px solid #D8CEBC;background:#fff;font-weight:800;font-size:16px;cursor:pointer}
+.scorebtns button{width:42px;height:42px;border-radius:10px;border:1px solid #C6D9CF;background:#fff;font-weight:800;font-size:16px;cursor:pointer}
 .scorebtns button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:#fff;border-top:1px solid var(--line);padding:6px 6px calc(10px + env(safe-area-inset-bottom))}
 .nav .in{max-width:560px;margin:0 auto;display:flex;justify-content:space-around}
@@ -92,42 +92,42 @@ label.l{font-size:13px;font-weight:700}
 .nav button{position:relative}
 .nav .ico{display:flex;align-items:center;justify-content:center;width:56px;height:32px;border-radius:16px;transition:background .15s}
 .nav button.on{color:var(--navy);font-weight:800}
-.nav button.on .ico{background:#F3E3BC}
+.nav button.on .ico{background:var(--g-soft)}
 .nav button.on::before{content:"";position:absolute;top:-7px;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;background:var(--navy)}
 .nav svg{width:22px;height:22px}
-.post{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-bottom:1px solid #EFE8DB}
+.post{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-bottom:1px solid #E3EEE8}
 .post:last-child{border-bottom:0}
 .overlay{position:fixed;inset:0;z-index:20;background:rgba(20,33,61,.55);display:flex;align-items:flex-end;justify-content:center}
 .sheet{width:100%;max-width:560px;max-height:88vh;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:18px 16px 28px;display:flex;flex-direction:column;gap:12px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:86px;z-index:30;background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;max-width:90vw}
-.sep{border:0;border-top:1px solid #EFE8DB;margin:4px 0}
-.drawg{border:1px solid #E7E2D3;border-radius:12px;padding:10px 12px;background:#fff}
+.sep{border:0;border-top:1px solid #E3EEE8;margin:4px 0}
+.drawg{border:1px solid #D9E6DF;border-radius:12px;padding:10px 12px;background:#fff}
 .drawg.ok{background:#F2F7F3;border-color:#CFE3D5}
-.drawg.next{border-color:#E76F51;box-shadow:0 0 0 2px rgba(231,111,81,.15)}
+.drawg.next{border-color:#3F8F78;box-shadow:0 0 0 2px rgba(63,143,120,.15)}
 .feed{padding:0;overflow:hidden}
-.feed .ph{display:block;width:100%;max-height:560px;object-fit:cover;background:#EFE8DB}
+.feed .ph{display:block;width:100%;max-height:560px;object-fit:cover;background:#E3EEE8}
 .feed video.ph{object-fit:contain;background:#000}
 .fb{display:flex;flex-direction:column;gap:6px;padding:10px 12px 12px}
 .ic{background:none;border:0;padding:4px;margin:-4px;color:var(--ink);cursor:pointer;min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center}
 .lnk{background:none;border:0;padding:0;color:var(--muted);font-size:13px;cursor:pointer;text-align:left}
 .nav button.hot svg{width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(231,111,81,.35))}
-.nav button.hot.on{color:#C2410C}
-.nav button.hot.on .ico{background:#FBE0D6}
-.nav button.hot.on::before{background:#E76F51}
+.nav button.hot.on{color:var(--navy)}
+.nav button.hot.on .ico{background:var(--g-soft)}
+.nav button.hot.on::before{background:var(--navy)}
 /* Campeonato: padrão HBJr */
 html.hbpage,html.hbpage body{background:#fff}
 .hb{font-family:Manrope,Inter,system-ui,sans-serif;color:#102F28;display:flex;flex-direction:column;gap:12px}
 .hb-lab{font-size:13px;font-weight:700;color:#102F28;display:block;margin-bottom:-6px}
 .hb-day .hb-lab{margin-bottom:4px}
 .hb-sel{width:100%;min-height:46px;border:1px solid #BCC8C2;border-radius:10px;background:#fff;padding:0 12px;font:700 16px Manrope,Inter,sans-serif;color:#102F28}
-.hb-hero{position:relative;overflow:hidden;background:#102F28;color:#fff;border-radius:16px;padding:18px 16px 20px}
+.hb-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--g-mid),var(--g-hero));color:#fff;border-radius:16px;padding:18px 16px 20px}
 .hb-hero::after{content:"";position:absolute;right:-70px;top:-60px;width:220px;height:220px;border:1px solid rgba(255,255,255,.28);border-radius:50%}
 .hb-kick{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.85}
 .hb-hero h2{margin:8px 0 6px;font:800 22px/1.15 Manrope,Inter,sans-serif;color:#fff}
 .hb-hero p{margin:0;font-size:15px;opacity:.8}
 .hb-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.hb-tabs button{min-height:40px;border:0;border-radius:10px;background:#ECF4EF;color:#102F28;font:600 15px Manrope,Inter,sans-serif;box-shadow:0 1px 2px rgba(16,47,40,.12);cursor:pointer}
-.hb-tabs button.on{background:#25745B;color:#fff}
+.hb-tabs button{min-height:40px;border:0;border-radius:10px;background:var(--g-soft);color:#102F28;font:600 15px Manrope,Inter,sans-serif;box-shadow:0 1px 2px rgba(16,47,40,.12);cursor:pointer}
+.hb-tabs button.on{background:var(--g-tab);color:#fff}
 .hb-tools .hb-sel{font-size:14px;padding:0 8px}
 .hb-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end}
 .hb-upd{min-height:46px;border:0;background:transparent;font:500 15px Manrope,Inter,sans-serif;color:#102F28;cursor:pointer}
@@ -194,7 +194,7 @@ const SEED = {"jogadores":["Norton","Hercílio","Felipe","Alexandre","Geraldo","
 const OLD_APP = "https://hbjr-beach-tennis.lovable.app/p/549659f8-77dd-49b1-a0ee-94311cb906ef";
 const DIAS = ["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
 const DIAS_CURTO = ["DOM","SEG","TER","QUA","QUI","SEX","SÁB"];
-const COLORS = ["#14213D","#0B6E6D","#2F6B45","#9A3412","#5B3E8C","#E76F51","#1F2A44","#7A5C12"];
+const COLORS = ["#2E7562","#3E8ED0","#8C6BB1","#4F9D8F","#B59A2B","#6C8F5E","#5C7FA8","#9C6B8E"];
 
 /* ---------- utilidades ---------- */
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -491,7 +491,7 @@ const ICON = {
   turma:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>'
 };
 const EMBLEM = s => `<svg width="${s}" height="${s}" viewBox="0 0 400 400" aria-hidden="true"><circle cx="200" cy="200" r="196" fill="#14213D"/><circle cx="200" cy="200" r="178" fill="none" stroke="#E9C46A" stroke-width="12"/><circle cx="200" cy="200" r="132" fill="#E9C46A"/><g transform="translate(200 238) rotate(-32)"><rect x="-9" y="-38" width="18" height="62" rx="6" fill="#14213D"/><ellipse cx="0" cy="-70" rx="34" ry="40" fill="#E76F51" stroke="#14213D" stroke-width="8"/></g><g transform="translate(200 238) rotate(32)"><rect x="-9" y="-38" width="18" height="62" rx="6" fill="#14213D"/><ellipse cx="0" cy="-70" rx="34" ry="40" fill="#E76F51" stroke="#14213D" stroke-width="8"/></g><circle cx="200" cy="124" r="24" fill="#F4F1DE" stroke="#14213D" stroke-width="7"/></svg>`;
-const av = n => `<span class="av" style="background:${colorOf(n)}">${esc(ini(n))}</span>`;
+const av = n => `<span class="av" style="background:${(typeof HB_COLORS!=="undefined" && HB_COLORS[n]) || colorOf(n)}">${esc(ini(n))}</span>`;
 
 /* ---------- telas ---------- */
 function vInicio(){
@@ -524,7 +524,7 @@ function vInicio(){
     ${(() => { const sor = sorteioOf(t, date); if (!sor) return `<button class="btn ghost small" data-act="view" data-v="jogo">Ver presença e sortear os jogos</button>`;
       const st = drawStatus(t, date, sor.jogos); const i = st.findIndex(x => !x);
       return i < 0 ? `<div class="muted">Sorteio: os ${sor.jogos.length} jogos já têm placar.</div><button class="btn ghost small" data-act="view" data-v="jogo">Ver jogos do dia</button>`
-        : `<div class="drawg next"><div class="kick" style="color:#E76F51">Jogo ${i+1} de ${sor.jogos.length}</div><div style="font-weight:700">${esc(sor.jogos[i].a.join(" / "))} <span class="muted">x</span> ${esc(sor.jogos[i].b.join(" / "))}</div></div><button class="btn ghost small" data-act="view" data-v="jogo">Ver todos os jogos sorteados</button>`; })()}
+        : `<div class="drawg next"><div class="kick" style="color:#2E7562">Jogo ${i+1} de ${sor.jogos.length}</div><div style="font-weight:700">${esc(sor.jogos[i].a.join(" / "))} <span class="muted">x</span> ${esc(sor.jogos[i].b.join(" / "))}</div></div><button class="btn ghost small" data-act="view" data-v="jogo">Ver todos os jogos sorteados</button>`; })()}
   </section>
   <section class="card col">
     <div class="row" style="justify-content:space-between"><h3>Resenha da turma</h3><button class="btn ghost small" data-act="view" data-v="mural">Abrir</button></div>
@@ -578,7 +578,7 @@ function vSorteio(t, date, L){
         let score = "";
         if (g) { const aIsA = j.a.includes(g.a1); const sa = aIsA? g.placar_a:g.placar_b, sb = aIsA? g.placar_b:g.placar_a; score = `<b>${sa} x ${sb}</b>`; }
         return `<div class="drawg ${g?'ok':''} ${next?'next':''}"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:8px">
-          <div style="flex:1"><div class="kick" style="color:${next?'#E76F51':'#6B7280'}">Jogo ${i+1}${next?' · agora':''}${rep?' · dupla repetida':''}</div>
+          <div style="flex:1"><div class="kick" style="color:${next?'#2E7562':'#6B7280'}">Jogo ${i+1}${next?' · agora':''}${rep?' · dupla repetida':''}</div>
           <div style="font-weight:700">${esc(j.a.join(" / "))} <span class="muted">x</span> ${esc(j.b.join(" / "))}</div>
           ${rest.length? `<div class="muted" style="font-size:12px">Descansa: ${rest.map(esc).join(", ")}</div>`:''}</div>
           ${g? `<div style="text-align:right">${score}<div class="muted" style="font-size:12px">lançado ✓</div></div>` : (c && S.f.scoreOpen !== i ? `<button class="btn ${next?'':'ghost'} small" data-act="dOpen" data-i="${i}">Lançar placar</button>`:'')}
@@ -688,7 +688,7 @@ function vRank(){
       ${S.confirm === "g:"+g.id ? `<button class="hb-del on" data-act="delGame" data-id="${esc(g.id)}">Confirmar exclusão</button>` : `<button class="hb-del" data-act="ask" data-id="g:${esc(g.id)}">Excluir</button>`}</div></article>`; }).join("") || '<p class="hb-foot">Sem jogos neste dia.</p>'}</div>` + foot;
   }
   const r = ranking(c, S.day);
-  const podium = [1,0,2].filter(i => r[i]).map(i => `<div class="pc p${i+1}"><span class="hav">${esc(r[i].nome[0])}</span><b>${esc(r[i].nome)}</b><div class="blk" style="background:${hbColor(c,r[i].nome)}">${MEDAL}<span>${r[i].total} pts</span></div></div>`).join("");
+  const podium = [1,0,2].filter(i => r[i]).map(i => `<div class="pc p${i+1}"><span class="hav">${esc(r[i].nome[0])}</span><b>${esc(r[i].nome)}</b><div class="blk" style="background:${mix(hbColor(c,r[i].nome),0.22)}">${MEDAL}<span>${r[i].total} pts</span></div></div>`).join("");
   const label = i => i===0?"CAMPEÃO":(i===1?"Segundo":(i===2?"Terceiro":""));
   const pct = x => x.aprov==null ? "—" : (x.aprov*100).toFixed(2).replace(".",",")+"%";
   return head + `
@@ -776,7 +776,7 @@ function vTurma(){
     <button class="btn ghost" data-act="saveTurma">Salvar horário e vagas</button>
   </section>
   <section class="card col"><h3>Campeonatos desta turma</h3>
-    ${champs.map(c => `<div class="col" style="border-bottom:1px solid #EFE8DB;padding-bottom:10px">
+    ${champs.map(c => `<div class="col" style="border-bottom:1px solid #E3EEE8;padding-bottom:10px">
       <div class="row"><b style="flex:1">${esc(c.nome)}</b>${c.encerrado?'<span class="tag">encerrado</span>':'<span class="tag ok">em andamento</span>'}</div>
       <div class="chips" style="flex-wrap:wrap">${(c.jogadores||[]).map(n => `<button class="chip" data-act="rosterDel" data-c="${esc(c.id)}" data-n="${esc(n)}" title="Tirar do ranking">${esc(n)} ×</button>`).join("")}
       ${t.membros.filter(n => !(c.jogadores||[]).includes(n)).map(n => `<button class="chip" style="border-style:dashed" data-act="rosterAdd" data-c="${esc(c.id)}" data-n="${esc(n)}">+ ${esc(n)}</button>`).join("")}</div>
